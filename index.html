@@ -72,23 +72,14 @@ body{background:#e8edf2;min-height:100vh;display:flex;align-items:flex-start;jus
 .hero .hs{font-size:13px;opacity:0.65;margin-top:4px;}
 .hero .ha{font-size:13px;opacity:0.85;margin-top:7px;font-weight:500;}
 .bc{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:13px;}
-.bw{margin-bottom:9px;}
-.bl{font-size:11px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px;}
-.bl span:last-child{font-family:'DM Mono',monospace;font-weight:500;color:var(--tx);}
-.bt{height:9px;background:rgba(26,46,74,0.08);border-radius:5px;overflow:hidden;}
+.bw{margin-bottom:11px;}
+.bl{font-size:11px;color:var(--mu);display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.bl .bleft{display:flex;align-items:center;gap:6px;}
+.bl .bright{font-family:'DM Mono',monospace;font-weight:500;color:var(--tx);font-size:12px;}
+.bt{height:9px;background:rgba(26,46,74,0.08);border-radius:5px;overflow:hidden;max-width:70%;}
 .bf{height:100%;border-radius:5px;}
-.ts{background:var(--gb);border:1px solid #b8e8d0;border-radius:10px;padding:14px 15px;margin-bottom:13px;}
-.ts h3{font-size:13px;font-weight:600;color:var(--gn);margin-bottom:6px;}
-.ts p{font-size:12px;color:#2a6045;line-height:1.55;margin-bottom:10px;}
-.trow{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:white;border-radius:7px;border:1px solid rgba(10,124,78,0.15);margin-bottom:5px;}
-.tnm{font-size:12px;font-weight:600;color:var(--tx);}
-.trt{font-size:10px;color:var(--mu);margin-top:1px;}
-.tvl{text-align:right;}
-.tvl .tmo{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--gn);}
-.tvl .tyr{font-family:'DM Mono',monospace;font-size:10px;color:var(--mu);margin-top:1px;}
-.trow.hi{background:#edfaf4;border-color:rgba(10,124,78,0.3);}
-.trow.base .tmo{color:var(--mu);}
-.ibadge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:0.3px;vertical-align:middle;margin-left:4px;}
+.ibadge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;letter-spacing:0.3px;vertical-align:middle;}
+.bc-footer{font-size:11px;color:#2a6045;margin-top:12px;padding-top:10px;border-top:1px solid rgba(10,124,78,0.15);}
 .cta{background:var(--brand);color:white;border-radius:10px;padding:16px;margin-bottom:13px;text-align:center;}
 .cta h3{font-size:14px;font-weight:600;margin-bottom:6px;}
 .cta p{font-size:12px;opacity:0.7;line-height:1.5;margin-bottom:12px;}
@@ -180,7 +171,7 @@ body{background:#e8edf2;min-height:100vh;display:flex;align-items:flex-start;jus
       <div class="tri" id="tri"></div>
       <div id="hero" class="hero"></div>
       <div id="bc" class="bc"></div>
-      <div id="tt" class="ts"></div>
+
       <div class="cta">
         <h3>Ready to explore your options?</h3>
         <p>Our team can find the right EV lease for your budget — and help you get set up on the best home charging tariff.</p>
@@ -325,59 +316,39 @@ function renderResults(){
     <div class="ha">The right tariff could close or reverse that gap ↓</div>`;
 
   const maxV=Math.max(fuelA,stdA)*1.12;
+  const pct=n=>Math.min((n/maxV*70),70).toFixed(1);
+
   document.getElementById('bc').innerHTML=`
-    <div class="slbl" style="margin-bottom:11px;">Cost comparison — ${view==='m'?'monthly':'annual'}</div>
+    <div class="slbl" style="margin-bottom:13px;">Cost comparison — ${view==='m'?'monthly':'annual'}</div>
     <div class="bw">
-      <div class="bl"><span>⛽ ${fuel} fuel</span><span>${fv(fuelA)}</span></div>
-      <div class="bt"><div class="bf" style="width:${(fuelA/maxV*100).toFixed(1)}%;background:#1a2e4a;"></div></div>
+      <div class="bl">
+        <div class="bleft"><span>⛽ ${fuel} fuel</span></div>
+        <div class="bright">${fv(fuelA)}</div>
+      </div>
+      <div class="bt" style="max-width:100%;"><div class="bf" style="width:${pct(fuelA)}%;background:#1a2e4a;"></div></div>
     </div>
     <div class="bw">
-      <div class="bl"><span>⚡ EV — standard (24p)</span><span>${fv(stdA)}</span></div>
-      <div class="bt"><div class="bf" style="width:${(stdA/maxV*100).toFixed(1)}%;background:#e8500a;"></div></div>
+      <div class="bl">
+        <div class="bleft"><span>⚡ EV — standard</span><span class="ibadge badge-fix">12M FIXED</span></div>
+        <div class="bright">${fv(stdA)}</div>
+      </div>
+      <div class="bt" style="max-width:100%;"><div class="bf" style="width:${pct(stdA)}%;background:#e8500a;"></div></div>
     </div>
     <div class="bw">
-      <div class="bl"><span>⚡ EV — Economy 7 (~9p night / 34p day)</span><span>${fv(e7NetA)}</span></div>
-      <div class="bt"><div class="bf" style="width:${(e7NetA/maxV*100).toFixed(1)}%;background:#1d9e75;"></div></div>
+      <div class="bl">
+        <div class="bleft"><span>⚡ EV — Economy 7</span><span class="ibadge badge-fix">12M FIXED</span></div>
+        <div class="bright">${fv(e7NetA)}</div>
+      </div>
+      <div class="bt" style="max-width:100%;"><div class="bf" style="width:${pct(e7NetA)}%;background:#1d9e75;"></div></div>
     </div>
-    <div class="bw" style="margin-bottom:0;">
-      <div class="bl"><span>⚡ EV — smart tariff (~7p night / 30p day)</span><span>${fv(evNetA)}</span></div>
-      <div class="bt"><div class="bf" style="width:${(evNetA/maxV*100).toFixed(1)}%;background:#0a7c4e;"></div></div>
-    </div>`;
-
-  const e7ExtraA=stdA-e7NetA;
-  const evExtraA=stdA-evNetA;
-
-  document.getElementById('tt').innerHTML=`
-    <h3>💡 The right home tariff unlocks further savings</h3>
-    <p>These figures already account for the effect on your whole home energy bill — not just your car charging.</p>
-    <div class="trow base">
-      <div>
-        <div class="tnm">Standard flat rate <span class="ibadge badge-fix">12M FIXED</span></div>
-        <div class="trt">24p/kWh all day</div>
+    <div class="bw" style="margin-bottom:8px;">
+      <div class="bl">
+        <div class="bleft"><span>⚡ EV — smart tariff</span><span class="ibadge badge-var">VARIABLE</span></div>
+        <div class="bright">${fv(evNetA)}</div>
       </div>
-      <div class="tvl"><div class="tmo" style="color:var(--mu)">${fv(stdA)}</div></div>
+      <div class="bt" style="max-width:100%;"><div class="bf" style="width:${pct(evNetA)}%;background:#0a7c4e;"></div></div>
     </div>
-    <div class="trow">
-      <div>
-        <div class="tnm">Economy 7 <span class="ibadge badge-fix">12M FIXED</span></div>
-        <div class="trt">9p night / 34p day</div>
-      </div>
-      <div class="tvl">
-        <div class="tmo">${fv(e7NetA)}</div>
-        <div class="tyr">save ${fv(e7ExtraA)} more</div>
-      </div>
-    </div>
-    <div class="trow hi">
-      <div>
-        <div class="tnm">EV smart tariff ✦ best <span class="ibadge badge-var">VARIABLE</span></div>
-        <div class="trt">7p night / 30p day</div>
-      </div>
-      <div class="tvl">
-        <div class="tmo">${fv(evNetA)}</div>
-        <div class="tyr">save ${fv(evExtraA)} more</div>
-      </div>
-    </div>
-    <div style="margin-top:9px;font-size:11px;color:#2a6045;">We work with a home energy partner who can review your full tariff picture — just ask when you enquire.</div>`;
+    <div class="bc-footer">💡 We work with a home energy partner who can review your full tariff picture — just ask when you enquire.</div>`;
 }
 
 renderCars();
