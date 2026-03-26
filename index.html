@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EV Running Cost Calculator</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--brand:#1a2e4a;--accent:#e8500a;--al:#fff3ee;--sf:#f7f8fa;--cd:#fff;--bd:rgba(26,46,74,0.12);--tx:#1a2e4a;--mu:#6b7a8f;--gn:#0a7c4e;--gb:#edfaf4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#e8edf2;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;}
+#evt{font-family:'DM Sans',sans-serif;background:var(--sf);color:var(--tx);width:100%;max-width:480px;border-radius:12px;box-shadow:0 4px 24px rgba(26,46,74,0.13);}
+.hdr{background:var(--brand);color:white;padding:20px 22px 16px;border-radius:12px 12px 0 0;}
+.hdr h1{font-size:17px;font-weight:600;margin-bottom:2px;}
+.hdr p{font-size:13px;opacity:0.65;}
+.hdr-btm{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px;}
+.sbar{display:flex;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;flex:1;}
+.sp{flex:1;text-align:center;padding:7px 4px;font-size:11px;font-weight:500;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s;}
+.sp.active{background:var(--accent);color:white;}
+.sp.done{color:rgba(255,255,255,0.75);}
+.mto{display:flex;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;flex-shrink:0;}
+.mt{padding:6px 11px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.18s;}
+.mt.on{background:rgba(255,255,255,0.22);color:white;}
+.body{padding:18px 18px 14px;}
+.slbl{font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--mu);margin-bottom:10px;}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:15px;margin-bottom:13px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fld label{display:block;font-size:12px;color:var(--mu);margin-bottom:5px;font-weight:500;}
+.fld input,.fld select{width:100%;height:38px;border:1.5px solid var(--bd);border-radius:7px;padding:0 10px;font-family:'DM Mono',monospace;font-size:14px;color:var(--tx);background:var(--sf);outline:none;transition:border-color 0.15s;}
+.fld input:focus,.fld select:focus{border-color:var(--accent);background:white;}
+.fld input.big{font-size:18px;font-weight:500;height:44px;}
+.mtog{display:flex;gap:6px;margin-bottom:12px;}
+.tb{flex:1;padding:7px 6px;border:1.5px solid var(--bd);border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;background:var(--sf);color:var(--mu);text-align:center;transition:all 0.15s;}
+.tb.active{border-color:var(--accent);background:var(--al);color:var(--accent);}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:4px;}
+.cbtn{border:1.5px solid var(--bd);border-radius:10px;padding:14px 8px 11px;text-align:center;cursor:pointer;background:var(--cd);transition:all 0.18s;}
+.cbtn:hover{border-color:rgba(232,80,10,0.4);}
+.cbtn.sel{border-color:var(--accent);background:var(--al);}
+.cbtn .ico{font-size:26px;color:var(--mu);margin-bottom:7px;display:block;transition:color 0.18s;}
+.cbtn.sel .ico{color:var(--accent);}
+.cbtn .cn{font-size:12px;font-weight:600;color:var(--tx);display:block;line-height:1.3;}
+.cbtn.sel .cn{color:var(--accent);}
+.cbtn .ce{font-size:10px;color:var(--mu);display:block;margin-top:2px;line-height:1.4;}
+.cbtn .ck{font-size:11px;color:var(--accent);font-weight:600;display:block;margin-top:5px;}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:rgba(26,46,74,0.06);color:var(--tx);padding:3px 9px;border-radius:20px;margin-top:7px;}
+.btnp{width:100%;height:44px;background:var(--accent);color:white;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s,transform 0.1s;margin-top:4px;}
+.btnp:hover{background:#d04208;}
+.btnp:active{transform:scale(0.99);}
+.back{display:flex;align-items:center;gap:6px;margin-bottom:14px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:500;}
+.back:hover{color:var(--tx);}
+.pnl{display:none;}
+.pnl.active{display:block;}
+.tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:13px;}
+.tc{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:14px 10px 12px;text-align:center;position:relative;margin-top:10px;}
+.tc.best{border-color:var(--gn);border-width:2px;}
+.tc .tcl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--mu);margin-bottom:6px;}
+.tc .tcv{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--tx);line-height:1;}
+.tc .tcs{font-size:10px;color:var(--mu);margin-top:3px;}
+.tc.best .tcv{color:var(--gn);}
+.badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.3px;}
+.badge-fix{background:#e8f0fb;color:#1a4fa8;}
+.badge-var{background:#fff3e0;color:#b45309;}
+.badge-best{background:#edfaf4;color:var(--gn);}
+.stag{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--al);border:1.5px solid var(--accent);border-radius:8px;margin-bottom:13px;}
+.stag i{color:var(--accent);font-size:20px;flex-shrink:0;}
+.stag span{font-size:13px;font-weight:500;color:var(--accent);}
+.hero{background:var(--brand);color:white;border-radius:10px;padding:16px;margin-bottom:13px;text-align:center;}
+.hero .hl{font-size:12px;opacity:0.6;margin-bottom:4px;}
+.hero .hv{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;color:#5de8a8;line-height:1;}
+.hero .hs{font-size:13px;opacity:0.65;margin-top:4px;}
+.hero .ha{font-size:13px;opacity:0.85;margin-top:7px;font-weight:500;}
+.bc{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:13px;}
+.bw{margin-bottom:9px;}
+.bl{font-size:11px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px;}
+.bl span:last-child{font-family:'DM Mono',monospace;font-weight:500;color:var(--tx);}
+.bt{height:9px;background:rgba(26,46,74,0.08);border-radius:5px;overflow:hidden;}
+.bf{height:100%;border-radius:5px;}
+.ts{background:var(--gb);border:1px solid #b8e8d0;border-radius:10px;padding:14px 15px;margin-bottom:13px;}
+.ts h3{font-size:13px;font-weight:600;color:var(--gn);margin-bottom:6px;}
+.ts p{font-size:12px;color:#2a6045;line-height:1.55;margin-bottom:10px;}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:white;border-radius:7px;border:1px solid rgba(10,124,78,0.15);margin-bottom:5px;}
+.tnm{font-size:12px;font-weight:600;color:var(--tx);}
+.trt{font-size:10px;color:var(--mu);margin-top:1px;}
+.tvl{text-align:right;}
+.tvl .tmo{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--gn);}
+.tvl .tyr{font-family:'DM Mono',monospace;font-size:10px;color:var(--mu);margin-top:1px;}
+.trow.hi{background:#edfaf4;border-color:rgba(10,124,78,0.3);}
+.trow.base .tmo{color:var(--mu);}
+.ibadge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:0.3px;vertical-align:middle;margin-left:4px;}
+.cta{background:var(--brand);color:white;border-radius:10px;padding:16px;margin-bottom:13px;text-align:center;}
+.cta h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.cta p{font-size:12px;opacity:0.7;line-height:1.5;margin-bottom:12px;}
+.ctab{padding:10px 24px;background:var(--accent);color:white;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
+.ctab:hover{background:#d04208;}
+.disc{font-size:10px;color:var(--mu);text-align:center;line-height:1.55;padding:0 4px 16px;}
+</style>
+</head>
+<body>
+<div id="evt">
+  <div class="hdr">
+    <h1>⚡ EV Running Cost Calculator</h1>
+    <p>See what switching to electric could save you every month</p>
+    <div class="hdr-btm">
+      <div class="sbar">
+        <div class="sp active" id="p1">1. Your car</div>
+        <div class="sp" id="p2">2. Your mileage</div>
+        <div class="sp" id="p3">3. Your saving</div>
+      </div>
+      <div class="mto">
+        <div class="mt on" id="mt-m" onclick="setView('m')">Monthly</div>
+        <div class="mt" id="mt-a" onclick="setView('a')">Annual</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- STEP 1 -->
+    <div class="pnl active" id="s1">
+      <div class="slbl">What are you driving now?</div>
+      <div class="card">
+        <div class="r2" style="margin-bottom:11px;">
+          <div class="fld">
+            <label>Fuel type</label>
+            <select id="fuelType" onchange="updatePPL()">
+              <option value="diesel">Diesel</option>
+              <option value="petrol">Petrol</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Pence per litre</label>
+            <input type="number" id="ppl" value="164.9" min="100" max="300" class="big"/>
+          </div>
+        </div>
+        <div class="fld">
+          <label>MPG — your car's fuel economy</label>
+          <input type="number" id="mpg" value="45" min="20" max="90"/>
+        </div>
+        <div class="chip">💡 Not sure? Diesel averages ~45 mpg · Petrol ~35 mpg</div>
+      </div>
+      <button class="btnp" onclick="go(2)">Next: My mileage →</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="pnl" id="s2">
+      <div class="back" onclick="go(1)">← Back</div>
+      <div class="slbl">How far do you drive?</div>
+      <div class="card" style="padding:14px 14px 11px;">
+        <div class="mtog">
+          <div class="tb active" id="tb-a" onclick="swm('a')">Annual</div>
+          <div class="tb" id="tb-w" onclick="swm('w')">Weekly</div>
+          <div class="tb" id="tb-d" onclick="swm('d')">Daily</div>
+        </div>
+        <div id="fa" class="fld">
+          <label>Annual mileage</label>
+          <input type="number" id="mA" value="10000" min="1000" max="60000" class="big" oninput="upd()"/>
+        </div>
+        <div id="fw" class="fld" style="display:none">
+          <label>Weekly miles</label>
+          <input type="number" id="mW" value="200" min="20" max="2000" class="big" oninput="upd()"/>
+        </div>
+        <div id="fd" class="fld" style="display:none">
+          <label>Daily miles (working days)</label>
+          <input type="number" id="mD" value="40" min="5" max="400" class="big" oninput="upd()"/>
+        </div>
+        <div class="chip" id="meq">≈ 10,000 miles/year · 833 miles/month</div>
+      </div>
+      <div class="slbl" style="margin-top:4px;">What kind of EV are you thinking about?</div>
+      <div class="cgrid" id="carGrid"></div>
+      <div class="chip" style="margin-bottom:14px;">Efficiency figures are typical real-world estimates</div>
+      <button class="btnp" onclick="go(3)">Calculate my saving →</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="pnl" id="s3">
+      <div class="back" onclick="go(2)">← Adjust inputs</div>
+      <div id="stag" class="stag"></div>
+      <div class="tri" id="tri"></div>
+      <div id="hero" class="hero"></div>
+      <div id="bc" class="bc"></div>
+      <div id="tt" class="ts"></div>
+      <div class="cta">
+        <h3>Ready to explore your options?</h3>
+        <p>Our team can find the right EV lease for your budget — and help you get set up on the best home charging tariff.</p>
+        <button class="ctab">Talk to an adviser</button>
+      </div>
+      <div class="disc">Estimates based on your inputs and typical real-world efficiency. Tariff figures include estimated impact on average home energy usage (2,700 kWh/yr). All figures indicative only.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CARS=[
+  {id:'city',  name:'City car',          eg:'Mini Electric, Fiat 500e',  mpk:4.5, fa:'fa-solid fa-car'},
+  {id:'hatch', name:'Family hatchback',  eg:'VW ID.3, Nissan Leaf',      mpk:3.8, fa:'fa-solid fa-car-side'},
+  {id:'exec',  name:'Executive saloon',  eg:'Tesla Model 3, BMW i4',     mpk:3.5, fa:'fa-solid fa-car-rear'},
+  {id:'suv',   name:'Family SUV',        eg:'VW ID.4, Hyundai IONIQ 5',  mpk:3.2, fa:'fa-solid fa-truck-pickup'},
+  {id:'large', name:'Large SUV / 7-seat',eg:'Tesla Model Y, Kia EV9',    mpk:2.8, fa:'fa-solid fa-van-shuttle'},
+];
+
+const PPL={diesel:164.9,petrol:142.9};
+const STD_P=24,E7_NIGHT=9,E7_DAY=34,EV_NIGHT=7,EV_DAY=30;
+const HOME_KWH=2700;
+
+let sel='hatch',mMode='a',view='m';
+let R={};
+
+function updatePPL(){
+  const ft=document.getElementById('fuelType').value;
+  document.getElementById('ppl').value=PPL[ft];
+  document.getElementById('mpg').value=ft==='diesel'?45:35;
+}
+
+function renderCars(){
+  document.getElementById('carGrid').innerHTML=CARS.map(c=>`
+    <div class="cbtn${sel===c.id?' sel':''}" onclick="pick('${c.id}')">
+      <i class="${c.fa} ico"></i>
+      <span class="cn">${c.name}</span>
+      <span class="ce">${c.eg}</span>
+      <span class="ck">~${c.mpk} mi/kWh</span>
+    </div>`).join('');
+}
+
+function pick(id){sel=id;renderCars();}
+
+function swm(m){
+  mMode=m;
+  ['a','w','d'].forEach(x=>{
+    document.getElementById('tb-'+x).classList.toggle('active',x===m);
+    document.getElementById('f'+x).style.display=x===m?'':'none';
+  });
+  upd();
+}
+
+function getAnnual(){
+  if(mMode==='a') return parseFloat(document.getElementById('mA').value)||10000;
+  if(mMode==='w') return (parseFloat(document.getElementById('mW').value)||200)*52;
+  return (parseFloat(document.getElementById('mD').value)||40)*235;
+}
+
+function upd(){
+  const a=getAnnual();
+  document.getElementById('meq').textContent='≈ '+Math.round(a).toLocaleString()+' miles/year · '+Math.round(a/12).toLocaleString()+' miles/month';
+}
+
+function setView(v){
+  view=v;
+  document.getElementById('mt-m').classList.toggle('on',v==='m');
+  document.getElementById('mt-a').classList.toggle('on',v==='a');
+  if(Object.keys(R).length) renderResults();
+}
+
+function f(n){return'£'+Math.round(n).toLocaleString();}
+function fv(n){return view==='m'?f(n/12)+'/mo':f(n)+'/yr';}
+
+function go(n){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  ['p1','p2','p3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','done');
+    if(i+1<n) el.classList.add('done');
+    if(i+1===n) el.classList.add('active');
+  });
+  if(n===3) calcAndRender();
+}
+
+function calcAndRender(){
+  const car=CARS.find(c=>c.id===sel)||CARS[1];
+  const ppl=parseFloat(document.getElementById('ppl').value)||164.9;
+  const mpg=parseFloat(document.getElementById('mpg').value)||45;
+  const fuel=document.getElementById('fuelType').value;
+  const annual=getAnnual();
+
+  const fuelA=annual*(1/(mpg*0.2199692))*(ppl/100);
+  const kwhA=annual/car.mpk;
+  const stdA=kwhA*(STD_P/100);
+  const e7NetA=kwhA*(E7_NIGHT/100)+HOME_KWH*((E7_DAY-STD_P)/100);
+  const evNetA=kwhA*(EV_NIGHT/100)+HOME_KWH*((EV_DAY-STD_P)/100);
+
+  R={car,fuel,annual,ppl,mpg,kwhA,fuelA,stdA,e7NetA,evNetA};
+  renderResults();
+}
+
+function renderResults(){
+  const {car,fuel,annual,fuelA,stdA,e7NetA,evNetA}=R;
+
+  document.getElementById('stag').innerHTML=`
+    <i class="${car.fa}"></i>
+    <span>Comparing against a <strong>${car.name.toLowerCase()}</strong> — ${car.eg}</span>`;
+
+  document.getElementById('tri').innerHTML=`
+    <div class="tc">
+      <div class="tcl">Your ${fuel}</div>
+      <div class="tcv">${fv(fuelA)}</div>
+      <div class="tcs">current cost</div>
+    </div>
+    <div class="tc" style="margin-top:10px;">
+      <div class="badge badge-fix">12m fixed</div>
+      <div class="tcl">EV — standard</div>
+      <div class="tcv">${fv(stdA)}</div>
+      <div class="tcs">at 24p/kWh</div>
+    </div>
+    <div class="tc best" style="margin-top:10px;">
+      <div class="badge badge-best">lowest cost</div>
+      <div class="tcl">EV — smart tariff</div>
+      <div class="tcv">${fv(evNetA)}</div>
+      <div class="tcs">~7p overnight</div>
+    </div>`;
+
+  const bestSaveA=fuelA-evNetA;
+  const heroIsPos=bestSaveA>0;
+
+  document.getElementById('hero').innerHTML=heroIsPos?`
+    <div class="hl">Potential saving vs your current ${fuel}</div>
+    <div class="hv">${fv(bestSaveA)}</div>
+    <div class="hs">switching to EV on a smart overnight tariff</div>
+    <div class="ha">Based on ${Math.round(annual).toLocaleString()} miles/yr · includes home energy impact</div>`:`
+    <div class="hl">Charging vs fuel cost difference</div>
+    <div class="hv" style="color:#f97c3c;">${fv(Math.abs(bestSaveA))}</div>
+    <div class="hs">more per ${view==='m'?'month':'year'} to charge vs ${fuel} at this mileage</div>
+    <div class="ha">The right tariff could close or reverse that gap ↓</div>`;
+
+  const maxV=Math.max(fuelA,stdA)*1.12;
+  document.getElementById('bc').innerHTML=`
+    <div class="slbl" style="margin-bottom:11px;">Cost comparison — ${view==='m'?'monthly':'annual'}</div>
+    <div class="bw">
+      <div class="bl"><span>⛽ ${fuel} fuel</span><span>${fv(fuelA)}</span></div>
+      <div class="bt"><div class="bf" style="width:${(fuelA/maxV*100).toFixed(1)}%;background:#1a2e4a;"></div></div>
+    </div>
+    <div class="bw">
+      <div class="bl"><span>⚡ EV — standard (24p)</span><span>${fv(stdA)}</span></div>
+      <div class="bt"><div class="bf" style="width:${(stdA/maxV*100).toFixed(1)}%;background:#e8500a;"></div></div>
+    </div>
+    <div class="bw">
+      <div class="bl"><span>⚡ EV — Economy 7 (~9p night / 34p day)</span><span>${fv(e7NetA)}</span></div>
+      <div class="bt"><div class="bf" style="width:${(e7NetA/maxV*100).toFixed(1)}%;background:#1d9e75;"></div></div>
+    </div>
+    <div class="bw" style="margin-bottom:0;">
+      <div class="bl"><span>⚡ EV — smart tariff (~7p night / 30p day)</span><span>${fv(evNetA)}</span></div>
+      <div class="bt"><div class="bf" style="width:${(evNetA/maxV*100).toFixed(1)}%;background:#0a7c4e;"></div></div>
+    </div>`;
+
+  const e7ExtraA=stdA-e7NetA;
+  const evExtraA=stdA-evNetA;
+
+  document.getElementById('tt').innerHTML=`
+    <h3>💡 The right home tariff unlocks further savings</h3>
+    <p>These figures already account for the effect on your whole home energy bill — not just your car charging.</p>
+    <div class="trow base">
+      <div>
+        <div class="tnm">Standard flat rate <span class="ibadge badge-fix">12M FIXED</span></div>
+        <div class="trt">24p/kWh all day</div>
+      </div>
+      <div class="tvl"><div class="tmo" style="color:var(--mu)">${fv(stdA)}</div></div>
+    </div>
+    <div class="trow">
+      <div>
+        <div class="tnm">Economy 7 <span class="ibadge badge-fix">12M FIXED</span></div>
+        <div class="trt">9p night / 34p day</div>
+      </div>
+      <div class="tvl">
+        <div class="tmo">${fv(e7NetA)}</div>
+        <div class="tyr">save ${fv(e7ExtraA)} more</div>
+      </div>
+    </div>
+    <div class="trow hi">
+      <div>
+        <div class="tnm">EV smart tariff ✦ best <span class="ibadge badge-var">VARIABLE</span></div>
+        <div class="trt">7p night / 30p day</div>
+      </div>
+      <div class="tvl">
+        <div class="tmo">${fv(evNetA)}</div>
+        <div class="tyr">save ${fv(evExtraA)} more</div>
+      </div>
+    </div>
+    <div style="margin-top:9px;font-size:11px;color:#2a6045;">We work with a home energy partner who can review your full tariff picture — just ask when you enquire.</div>`;
+}
+
+renderCars();
+upd();
+</script>
+</body>
+</html>
