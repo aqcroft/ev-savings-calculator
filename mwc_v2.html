@@ -85,7 +85,7 @@
   .calc-hdr p { font-size: 12px; opacity: 0.65; }
 
   .calc-hdr-top img {
-    height: 36px;
+    height: 47px;
     width: auto;
     object-fit: contain;
     flex-shrink: 0;
@@ -311,7 +311,7 @@
 
   /* ─── HERO RESULT ─── */
   .hero-result {
-    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    background: linear-gradient(150deg, var(--blue) 0%, var(--blue-2) 100%);
     color: white;
     border-radius: var(--r-lg);
     padding: 16px 16px 14px;
@@ -321,7 +321,7 @@
   }
 
   .hero-result .hl { font-size: 11px; opacity: 0.60; margin-bottom: 5px; }
-  .hero-result .hv { font-family: "DM Mono", monospace; font-size: 38px; font-weight: 500; color: #5de8a8; line-height: 1; }
+  .hero-result .hv { font-family: "DM Mono", monospace; font-size: 38px; font-weight: 500; color: #a8f0d4; line-height: 1; }
   .hero-result .hs { font-size: 12px; opacity: 0.65; margin-top: 4px; }
   .hero-result .ha { font-size: 12px; opacity: 0.80; margin-top: 7px; font-weight: 700; }
 
@@ -345,14 +345,15 @@
 
   .hmt {
     flex: 1;
-    color: rgba(255,255,255,0.42);
+    color: rgba(255,255,255,0.38);
     cursor: pointer;
-    padding: 7px 0;
-    font-size: 12px;
+    padding: 8px 4px;
+    font-size: 11px;
     font-weight: 700;
-    transition: all 0.18s;
-    border-radius: 7px;
+    transition: background 0.18s, color 0.18s;
+    border-radius: 6px;
     text-align: center;
+    line-height: 1.3;
   }
 
   .hmt.on { background: rgba(255,255,255,0.20); color: white; }
@@ -483,7 +484,7 @@
 
   /* ─── CTA ─── */
   .calc-cta {
-    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    background: linear-gradient(150deg, var(--blue) 0%, var(--blue-2) 100%);
     color: white;
     border-radius: var(--r-lg);
     padding: 16px;
@@ -631,9 +632,9 @@
         <div class="uw-bridge">
           <div class="uw-bridge-text">
             We've partnered with Utility Warehouse to offer EV smart tariffs alongside other household services.
-            <a href="https://connectors.uw.co.uk/CN-8RVO" target="_blank" rel="noopener">Find out more</a>
+            <a href="https://connectors.uw.co.uk/CN-25OW" target="_blank" rel="noopener">Find out more</a>
           </div>
-          <a href="https://connectors.uw.co.uk/CN-8RVO" target="_blank" rel="noopener">
+          <a href="https://connectors.uw.co.uk/CN-25OW" target="_blank" rel="noopener">
             <img src="assets/UW_logo.webp" alt="Utility Warehouse" class="uw-bridge-logo"/>
           </a>
         </div>
@@ -739,7 +740,7 @@
   }
 
   function f(n)   { return "£" + Math.round(n).toLocaleString("en-GB"); }
-  function fv(n)  { return view==="m" ? f(n/12)+"/m" : f(n)+"/yr"; }
+  function fv(n)  { return view==="m" ? f(n/12)+"/m" : f(n)+"/y"; }
 
   /* ── CALC ── */
   function calcAndRender() {
@@ -799,18 +800,18 @@
     const toggles = `<div class="hmt-wrap"><div class="hmt-bar"><div class="hmt${view==="m"?" on":""}" onclick="setView('m')">Monthly</div><div class="hmt${view==="a"?" on":""}" onclick="setView('a')">Annual</div></div></div>`;
 
     document.getElementById("heroResult").innerHTML = pos
-      ? `<div class="hl">vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/yr</div>
+      ? `<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div>
          <div class="hv">${fv(bestSave)}</div>
          <div class="ha">${car.name} EV on a smart tariff</div>
          ${toggles}`
-      : `<div class="hl">vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/yr</div>
+      : `<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div>
          <div class="hv" style="color:#f97c3c;">${fv(Math.abs(bestSave))}</div>
          <div class="hs">more per ${view==="m"?"month":"year"} to charge — the right tariff could narrow that gap</div>
          <div class="ha">${car.name} EV</div>
          ${toggles}`;
 
-    const stCol = cheapest==="std" ? "#FF7C00" : "#d3b06b";
-    const e7Col = cheapest==="e7"  ? "#FF7C00" : "#d3b06b";
+    const stCol = cheapest==="std" ? "#FF7C00" : "#0071BA";
+    const e7Col = cheapest==="e7"  ? "#FF7C00" : "#0071BA";
     const maxV  = Math.max(fuelA, stdA) * 1.12;
     const pct   = n => Math.min(n/maxV*70, 70).toFixed(1);
 
