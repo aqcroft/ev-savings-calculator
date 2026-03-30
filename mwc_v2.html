@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -527,6 +528,58 @@
 
   .hide { display: none !important; }
 
+  /* ─── STEPPERS ─── */
+  .input-stepper {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+  }
+
+  .input-stepper input {
+    flex: 1;
+    border-radius: var(--r-sm) 0 0 var(--r-sm) !important;
+    border-right: none !important;
+  }
+
+  .stepper-btns {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .stepper-btns button {
+    width: 32px;
+    flex: 1;
+    border: 1.5px solid var(--line-mid);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .stepper-btns button:first-child {
+    border-radius: 0 var(--r-sm) 0 0;
+    border-bottom: none;
+  }
+
+  .stepper-btns button:last-child {
+    border-radius: 0 0 var(--r-sm) 0;
+  }
+
+  .stepper-btns button:hover {
+    background: var(--blue-soft);
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+
   @media (max-width: 520px) {
     body { padding: 0; background: transparent; }
     #evt { border-radius: 0; box-shadow: none; max-width: 100%; }
@@ -576,12 +629,24 @@
             </div>
             <div class="fld">
               <label>Pence per litre</label>
-              <input type="number" id="ppl" value="164.9" min="100" max="300" class="big"/>
+              <div class="input-stepper">
+                <input type="number" id="ppl" value="164.9" min="100" max="300" class="big" step="1"/>
+                <div class="stepper-btns">
+                  <button type="button" onclick="stepVal('ppl',1,1,100,300,true)">▲</button>
+                  <button type="button" onclick="stepVal('ppl',-1,1,100,300,true)">▼</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="fld" style="margin-bottom:11px;">
             <label>MPG — your car's fuel economy</label>
-            <input type="number" id="mpg" value="45" min="20" max="90"/>
+            <div class="input-stepper">
+              <input type="number" id="mpg" value="45" min="20" max="90"/>
+              <div class="stepper-btns">
+                <button type="button" onclick="stepVal('mpg',1,1,20,90,false)">▲</button>
+                <button type="button" onclick="stepVal('mpg',-1,1,20,90,false)">▼</button>
+              </div>
+            </div>
           </div>
           <div class="chip" style="margin-bottom:12px;">💡 Not sure? Diesel ~45 mpg · Petrol ~35 mpg</div>
 
@@ -594,15 +659,33 @@
             </div>
             <div id="fa" class="fld">
               <label>Annual mileage</label>
-              <input type="text" id="mA" value="10,000" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+              <div class="input-stepper">
+                <input type="text" id="mA" value="10,000" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                <div class="stepper-btns">
+                  <button type="button" onclick="stepMiles('mA',500)">▲</button>
+                  <button type="button" onclick="stepMiles('mA',-500)">▼</button>
+                </div>
+              </div>
             </div>
             <div id="fw" class="fld hide">
               <label>Weekly miles</label>
-              <input type="text" id="mW" value="200" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+              <div class="input-stepper">
+                <input type="text" id="mW" value="200" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                <div class="stepper-btns">
+                  <button type="button" onclick="stepMiles('mW',50)">▲</button>
+                  <button type="button" onclick="stepMiles('mW',-50)">▼</button>
+                </div>
+              </div>
             </div>
             <div id="fd" class="fld hide">
               <label>Daily miles (working days)</label>
-              <input type="text" id="mD" value="40" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+              <div class="input-stepper">
+                <input type="text" id="mD" value="40" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                <div class="stepper-btns">
+                  <button type="button" onclick="stepMiles('mD',5)">▲</button>
+                  <button type="button" onclick="stepMiles('mD',-5)">▼</button>
+                </div>
+              </div>
             </div>
             <div class="chip" id="meq" style="margin-top:6px;">≈ 10,000 miles/year · 833 miles/month</div>
           </div>
@@ -713,6 +796,29 @@
     const a = getAnnual();
     const el = document.getElementById("meq");
     if (el) el.textContent = "≈ " + Math.round(a).toLocaleString("en-GB") + " miles/year · " + Math.round(a/12).toLocaleString("en-GB") + " miles/month";
+  }
+
+  /* ── STEPPERS ── */
+  function stepVal(id, dir, step, min, max, keepDecimal) {
+    const el = document.getElementById(id);
+    let val = parseFloat(el.value) || 0;
+    if (keepDecimal) {
+      // preserve the .9 — step the integer part only
+      const dec = val - Math.floor(val);
+      val = Math.round(Math.floor(val) + dir * step) + dec;
+    } else {
+      val = Math.round(val + dir * step);
+    }
+    val = Math.max(min, Math.min(max, val));
+    el.value = keepDecimal ? val.toFixed(1) : val;
+  }
+
+  function stepMiles(id, step) {
+    const el = document.getElementById(id);
+    let val = parseFloat((el.value || "0").replace(/,/g, "")) || 0;
+    val = Math.max(0, val + step);
+    el.value = val.toLocaleString("en-GB");
+    upd();
   }
 
   /* ── EV GRID ── */
