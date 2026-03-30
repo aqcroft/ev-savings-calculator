@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EV Running Cost Calculator | MWC Vehicle Contracts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  /* ─── MWC TOKENS ─── */
+  :root {
+    --navy:       #253B50;
+    --navy-2:     #1c2e40;
+    --blue:       #0071BA;
+    --blue-2:     #005fa0;
+    --blue-soft:  #e6f2fb;
+    --orange:     #FF7C00;   /* offer highlight */
+    --red:        #B23838;   /* offer highlight */
+    --green:      #0a7c4e;
+    --green-soft: #edfaf4;
+    --ink:        #1a2e4a;
+    --ink-soft:   #6b7a8f;
+    --surface:    #ffffff;
+    --surface-2:  #f7f8fa;
+    --line:       rgba(26,46,74,0.11);
+    --line-mid:   rgba(26,46,74,0.18);
+    --sh-sm:      0 4px 14px rgba(26,46,74,0.08);
+    --sh-md:      0 12px 32px rgba(26,46,74,0.10);
+    --sh-lg:      0 24px 52px rgba(26,46,74,0.14);
+    --r-xl:       14px;
+    --r-lg:       10px;
+    --r-md:       9px;
+    --r-sm:       7px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", sans-serif;
+    background: #e8edf2;
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding: 24px 16px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* ─── SHELL ─── */
+  #evt {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface-2);
+    border-radius: var(--r-xl);
+    box-shadow: var(--sh-lg);
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .calc-hdr {
+    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: white;
+    padding: 20px 20px 16px;
+  }
+
+  .calc-hdr-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .calc-hdr h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f0d49a;
+    margin-bottom: 3px;
+  }
+
+  .calc-hdr p { font-size: 12px; opacity: 0.65; }
+
+  .calc-hdr-top img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .calc-steps {
+    display: flex;
+    border-radius: 7px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .calc-step {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    color: rgba(255,255,255,0.38);
+    transition: background 0.18s, color 0.18s;
+    line-height: 1.3;
+  }
+
+  .calc-step.active { background: var(--blue); color: white; }
+  .calc-step.done   { color: rgba(255,255,255,0.72); }
+
+  /* ─── BODY ─── */
+  .calc-body { padding: 16px; }
+
+  .calc-body-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .calc-panel {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    pointer-events: none;
+    position: relative;
+    z-index: 0;
+  }
+
+  .calc-panel.active {
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 1;
+  }
+
+  /* ─── FORM ELEMENTS ─── */
+  .slbl {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .fld label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+
+  .fld input, .fld select {
+    width: 100%;
+    height: 40px;
+    border: 1.5px solid var(--line-mid);
+    border-radius: var(--r-sm);
+    padding: 0 11px;
+    font-family: "DM Mono", monospace;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--surface-2);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .fld input:focus, .fld select:focus { border-color: var(--blue); background: white; }
+  .fld input.big { font-size: 17px; font-weight: 500; height: 44px; }
+
+  /* Mileage toggles */
+  .mtog {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .tb {
+    flex: 1;
+    padding: 7px 4px;
+    border: 1.5px solid var(--line-mid);
+    border-radius: var(--r-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .tb.active {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    background: var(--blue-soft);
+    color: var(--navy);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-top: 7px;
+  }
+
+  /* ─── EV CHOICE GRID ─── */
+  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 4px; }
+
+  .cbtn {
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 14px 8px 11px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--surface);
+    transition: all 0.18s;
+    box-shadow: var(--sh-sm);
+  }
+
+  .cbtn:hover { border-color: rgba(0,113,186,0.34); transform: translateY(-1px); }
+  .cbtn.sel   { border-color: var(--blue); background: var(--blue-soft); }
+
+  .cbtn .ico {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: var(--ink-soft);
+    transition: color 0.18s;
+  }
+
+  .cbtn.sel .ico { color: var(--blue); }
+  .cbtn .cn { font-size: 12px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3; }
+  .cbtn.sel .cn { color: var(--blue); }
+  .cbtn .ce { font-size: 10px; color: var(--ink-soft); display: block; margin-top: 2px; line-height: 1.4; }
+  .cbtn .ck { font-size: 11px; color: var(--orange); font-weight: 700; display: block; margin-top: 5px; }
+
+  /* ─── BUTTONS ─── */
+  .btnp {
+    width: 100%;
+    height: 44px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+    box-shadow: 0 4px 14px rgba(0,113,186,0.28);
+  }
+
+  .btnp:hover { background: var(--blue-2); }
+  .btnp:active { transform: scale(0.99); }
+
+  /* ─── RESULTS ─── */
+  .tri {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .tc {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 14px 8px 11px;
+    text-align: center;
+    position: relative;
+    margin-top: 10px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .tcl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); margin-bottom: 6px; }
+  .tcv { font-family: "DM Mono", monospace; font-size: 17px; font-weight: 500; color: var(--ink); line-height: 1; }
+  .tcs { font-size: 9px; color: var(--ink-soft); margin-top: 4px; }
+
+  .badge {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  .badge-fix  { background: #fff3e0; color: var(--orange); }
+  .badge-best { background: var(--green-soft); color: var(--green); }
+
+  /* ─── HERO RESULT ─── */
+  .hero-result {
+    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: white;
+    border-radius: var(--r-lg);
+    padding: 16px 16px 14px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: var(--sh-md);
+  }
+
+  .hero-result .hl { font-size: 11px; opacity: 0.60; margin-bottom: 5px; }
+  .hero-result .hv { font-family: "DM Mono", monospace; font-size: 38px; font-weight: 500; color: #5de8a8; line-height: 1; }
+  .hero-result .hs { font-size: 12px; opacity: 0.65; margin-top: 4px; }
+  .hero-result .ha { font-size: 12px; opacity: 0.80; margin-top: 7px; font-weight: 700; }
+
+  /* ─── TOGGLE — centred wide pill ─── */
+  .hmt-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+    padding: 0 12px;
+  }
+
+  .hmt-bar {
+    display: flex;
+    flex-direction: row;
+    background: rgba(255,255,255,0.10);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 260px;
+    overflow: hidden;
+  }
+
+  .hmt {
+    flex: 1;
+    color: rgba(255,255,255,0.42);
+    cursor: pointer;
+    padding: 7px 0;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.18s;
+    border-radius: 7px;
+    text-align: center;
+  }
+
+  .hmt.on { background: rgba(255,255,255,0.20); color: white; }
+
+  /* ─── BREAKDOWN ─── */
+  .big-acc-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 11px 13px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    box-shadow: var(--sh-sm);
+  }
+
+  .big-acc-toggle .chev { font-size: 11px; color: var(--ink-soft); transition: transform 0.2s; }
+  .big-acc-toggle.open .chev { transform: rotate(180deg); }
+
+  .bc {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 13px;
+    margin-bottom: 9px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .bw { margin-bottom: 10px; }
+  .brow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 10px; }
+  .bleft { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--ink-soft); flex: 1; min-width: 0; flex-wrap: wrap; row-gap: 3px; }
+  .bright { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+  .bval { font-family: "DM Mono", monospace; font-weight: 500; color: var(--ink); font-size: 12px; }
+  .bchev { color: var(--ink-soft); font-size: 11px; cursor: pointer; padding: 2px 4px; transition: transform 0.2s; user-select: none; }
+  .bchev.open { transform: rotate(180deg); }
+  .bt { height: 8px; background: rgba(26,46,74,0.08); border-radius: 5px; overflow: hidden; }
+  .bf { height: 100%; border-radius: 5px; }
+
+  .acc {
+    display: none;
+    margin-top: 7px;
+    padding: 9px 9px 5px;
+    background: var(--surface-2);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+  }
+
+  .acc.open { display: block; }
+
+  .acc-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); margin-bottom: 5px; gap: 8px; }
+  .acc-row span:last-child { font-family: "DM Mono", monospace; font-weight: 500; color: var(--ink); font-size: 11px; white-space: nowrap; }
+  .acc-row.total { border-top: 1px solid var(--line); padding-top: 5px; margin-top: 2px; font-weight: 700; color: var(--ink); }
+
+  .adj-label { display: flex; align-items: center; gap: 5px; }
+  .tip-wrap  { position: relative; display: inline-flex; }
+
+  .tip-btn {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(26,46,74,0.10); color: var(--ink-soft);
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; font-family: inherit; flex-shrink: 0; line-height: 1;
+  }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: white;
+    font-size: 10px;
+    line-height: 1.45;
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 210px;
+    text-align: left;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--navy);
+  }
+
+  .tip-wrap.show .tooltip { display: block; }
+
+  /* ─── UW BRIDGE ─── */
+  .uw-bridge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 12px 0;
+    padding: 13px 15px;
+    background: var(--blue-soft);
+    border: 1px solid rgba(0,113,186,0.16);
+    border-radius: var(--r-lg);
+  }
+
+  .uw-bridge-text {
+    flex: 1; min-width: 0;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .uw-bridge-text a { color: var(--blue); font-weight: 700; text-decoration: underline; }
+
+  .uw-bridge-logo {
+    flex: 0 0 72px;
+    width: 72px;
+    height: auto;
+    object-fit: contain;
+    margin-left: auto;
+  }
+
+  /* ─── CTA ─── */
+  .calc-cta {
+    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: white;
+    border-radius: var(--r-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    text-align: center;
+    box-shadow: var(--sh-md);
+  }
+
+  .calc-cta h3 { font-size: 14px; font-weight: 700; color: #f0d49a; margin-bottom: 6px; }
+  .calc-cta p  { font-size: 12px; opacity: 0.72; line-height: 1.55; margin-bottom: 14px; }
+
+  .ctab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 28px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255,124,0,0.30);
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .ctab:hover { background: #e06e00; transform: translateY(-1px); }
+
+  .disc {
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 4px 14px;
+  }
+
+  .hide { display: none !important; }
+
+  @media (max-width: 520px) {
+    body { padding: 0; background: transparent; }
+    #evt { border-radius: 0; box-shadow: none; max-width: 100%; }
+    .r2 { grid-template-columns: 1fr; }
+    .tri { gap: 6px; }
+    .tc { padding: 13px 6px 10px; }
+    .tcl { font-size: 8px; }
+    .tcv { font-size: 14px; }
+    .hero-result .hv { font-size: 32px; }
+    .uw-bridge { flex-direction: row; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<div id="evt">
+
+  <div class="calc-hdr">
+    <div class="calc-hdr-top">
+      <div>
+        <h2>EV Running Cost Calculator</h2>
+        <p>See what switching to electric could save you every month</p>
+      </div>
+      <!-- swap src for MWC logo when embedding -->
+      <!-- <img src="/assets/mwc-logo.webp" alt="MWC Vehicle Contracts" /> -->
+    </div>
+    <div class="calc-steps">
+      <div class="calc-step active" id="p1" onclick="go(1)">1. Your car &amp; mileage</div>
+      <div class="calc-step"        id="p2" onclick="go(2)">2. Your EV choice</div>
+      <div class="calc-step"        id="p3" onclick="go(3)">3. Your saving</div>
+    </div>
+  </div>
+
+  <div class="calc-body">
+    <div class="calc-body-inner">
+
+      <!-- ── STEP 1: Car + Mileage ── -->
+      <div class="calc-panel active" id="s1">
+        <div class="slbl">What are you driving now?</div>
+        <div class="card">
+          <div class="r2" style="margin-bottom:11px;">
+            <div class="fld">
+              <label>Fuel type</label>
+              <select id="fuelType" onchange="updatePPL()">
+                <option value="diesel">Diesel</option>
+                <option value="petrol">Petrol</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Pence per litre</label>
+              <input type="number" id="ppl" value="164.9" min="100" max="300" class="big"/>
+            </div>
+          </div>
+          <div class="fld" style="margin-bottom:11px;">
+            <label>MPG — your car's fuel economy</label>
+            <input type="number" id="mpg" value="45" min="20" max="90"/>
+          </div>
+          <div class="chip" style="margin-bottom:12px;">💡 Not sure? Diesel ~45 mpg · Petrol ~35 mpg</div>
+
+          <div style="border-top:1px solid var(--line);margin:0 -14px;padding:12px 14px 0;">
+            <div class="slbl" style="margin-bottom:8px;">How many miles do you drive?</div>
+            <div class="mtog">
+              <div class="tb active" id="tb-a" onclick="swm('a')">Annual</div>
+              <div class="tb"        id="tb-w" onclick="swm('w')">Weekly</div>
+              <div class="tb"        id="tb-d" onclick="swm('d')">Daily</div>
+            </div>
+            <div id="fa" class="fld">
+              <label>Annual mileage</label>
+              <input type="text" id="mA" value="10,000" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+            </div>
+            <div id="fw" class="fld hide">
+              <label>Weekly miles</label>
+              <input type="text" id="mW" value="200" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+            </div>
+            <div id="fd" class="fld hide">
+              <label>Daily miles (working days)</label>
+              <input type="text" id="mD" value="40" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+            </div>
+            <div class="chip" id="meq" style="margin-top:6px;">≈ 10,000 miles/year · 833 miles/month</div>
+          </div>
+        </div>
+        <button class="btnp" onclick="go(2)">Next: Choose your EV →</button>
+      </div>
+
+      <!-- ── STEP 2: EV Choice ── -->
+      <div class="calc-panel" id="s2">
+        <div class="slbl">What kind of EV are you thinking about?</div>
+        <div class="cgrid" id="carGrid"></div>
+        <div class="chip" style="margin-bottom:13px;">Efficiency figures are typical real-world estimates</div>
+        <button class="btnp" onclick="go(3)">Calculate our saving →</button>
+      </div>
+
+      <!-- ── STEP 3: Results ── -->
+      <div class="calc-panel" id="s3">
+        <div class="tri" id="tri"></div>
+        <div id="heroResult" class="hero-result"></div>
+
+        <div class="big-acc-toggle" id="bc-toggle" onclick="toggleBigAcc('bc','bc-toggle')">
+          <span>Show full cost breakdown</span>
+          <span class="chev">▾</span>
+        </div>
+        <div id="bc" class="bc acc"></div>
+
+        <div class="uw-bridge">
+          <div class="uw-bridge-text">
+            We've partnered with Utility Warehouse to offer EV smart tariffs alongside other household services.
+            <a href="https://connectors.uw.co.uk/CN-8RVO" target="_blank" rel="noopener">Find out more</a>
+          </div>
+          <a href="https://connectors.uw.co.uk/CN-8RVO" target="_blank" rel="noopener">
+            <img src="assets/UW_logo.webp" alt="Utility Warehouse" class="uw-bridge-logo"/>
+          </a>
+        </div>
+
+        <div class="calc-cta">
+          <h3>Ready to explore your options?</h3>
+          <p>Our team can find the right EV lease for your budget — and help you get set up on the best home charging tariff.</p>
+          <a class="ctab" href="tel:03304042193">Talk to an adviser</a>
+        </div>
+
+        <div class="disc" id="disc"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── SVG ILLUSTRATIONS ── */
+  const SVGS = {
+    hatch:`<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 24 L4 18 Q4 16 6 16 L11 16 L18 8 Q20 6 24 6 L42 6 Q46 6 48 8 L54 16 L59 16 Q61 16 61 18 L61 24 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><rect x="22" y="7" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="33" y="7" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
+    exec: `<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 24 L3 19 Q3 17 5 17 L11 17 L19 9 Q21 7 25 7 L42 7 Q46 7 48 9 L54 17 L60 17 Q62 17 62 19 L62 24 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><rect x="23" y="8" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="34" y="8" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
+    suv:  `<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 25 L3 17 Q3 15 5 15 L10 15 L15 7 Q17 5 21 5 L44 5 Q48 5 50 7 L55 15 L61 15 Q63 15 63 17 L63 25 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="25" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="25" r="5" stroke="currentColor" stroke-width="1.5"/><rect x="19" y="6" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="31" y="6" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
+    large:`<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 25 L2 16 Q2 14 4 14 L9 14 L13 6 Q15 4 19 4 L46 4 Q50 4 52 6 L57 14 L62 14 Q64 14 62 16 L62 25 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="14" cy="25" r="5.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="25" r="5.5" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="5" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="28" y="5" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="39" y="5" width="7" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
+  };
+
+  /* ── DATA ── */
+  const CARS = [
+    { id:"hatch", name:"Family hatchback",   eg:"VW ID.3, Nissan Leaf",      mpk:3.8 },
+    { id:"exec",  name:"Executive saloon",   eg:"Tesla Model 3, BMW i4",     mpk:3.5 },
+    { id:"suv",   name:"Family SUV",          eg:"VW ID.4, Hyundai IONIQ 5",  mpk:3.2 },
+    { id:"large", name:"Large SUV / 7-seat",  eg:"Tesla Model Y, Kia EV9",    mpk:2.8 },
+  ];
+
+  const PPL = { diesel:164.9, petrol:142.9 };
+  const STD_P=24, E7_NIGHT=9, E7_DAY=34, EV_NIGHT=7, EV_DAY=30, HOME_KWH=2700;
+  const TOOLTIP = "Overnight charging is cheaper — but daytime electricity costs more on this plan. We've factored both in.";
+
+  let sel="hatch", mMode="a", view="m", R={};
+
+  /* ── STEP NAV ── */
+  function go(n) {
+    ["s1","s2","s3"].forEach((id,i) => {
+      const p = document.getElementById(id);
+      if (p) p.classList.toggle("active", i+1===n);
+    });
+    ["p1","p2","p3"].forEach((id,i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("active","done");
+      if (i+1 < n)  el.classList.add("done");
+      if (i+1 === n) el.classList.add("active");
+    });
+    if (n===3) calcAndRender();
+  }
+
+  /* ── FUEL / MPG ── */
+  function updatePPL() {
+    const ft = document.getElementById("fuelType").value;
+    document.getElementById("ppl").value = PPL[ft];
+    document.getElementById("mpg").value = ft==="diesel" ? 45 : 35;
+  }
+
+  /* ── MILEAGE ── */
+  function fmtMiles(el) {
+    const r = el.value.replace(/[^0-9]/g,"");
+    if (r) el.value = parseInt(r,10).toLocaleString("en-GB");
+  }
+
+  function swm(m) {
+    mMode = m;
+    ["a","w","d"].forEach(x => {
+      document.getElementById("tb-"+x).classList.toggle("active", x===m);
+      document.getElementById("f"+x).classList.toggle("hide", x!==m);
+    });
+    upd();
+  }
+
+  function getAnnual() {
+    const clean = id => parseFloat((document.getElementById(id).value||"0").replace(/,/g,""))||0;
+    if (mMode==="a") return clean("mA") || 10000;
+    if (mMode==="w") return (clean("mW") || 200) * 52;
+    return (clean("mD") || 40) * 235;
+  }
+
+  function upd() {
+    const a = getAnnual();
+    const el = document.getElementById("meq");
+    if (el) el.textContent = "≈ " + Math.round(a).toLocaleString("en-GB") + " miles/year · " + Math.round(a/12).toLocaleString("en-GB") + " miles/month";
+  }
+
+  /* ── EV GRID ── */
+  function renderCars() {
+    document.getElementById("carGrid").innerHTML = CARS.map(c => `
+      <div class="cbtn${sel===c.id?" sel":""}" onclick="pick('${c.id}')">
+        <div class="ico">${SVGS[c.id]}</div>
+        <span class="cn">${c.name}</span>
+        <span class="ce">${c.eg}</span>
+        <span class="ck">~${c.mpk} mi/kWh</span>
+      </div>`).join("");
+  }
+
+  function pick(id) { sel=id; renderCars(); }
+
+  /* ── VIEW TOGGLE ── */
+  function setView(v) {
+    view = v;
+    if (Object.keys(R).length) renderResults();
+  }
+
+  function f(n)   { return "£" + Math.round(n).toLocaleString("en-GB"); }
+  function fv(n)  { return view==="m" ? f(n/12)+"/m" : f(n)+"/yr"; }
+
+  /* ── CALC ── */
+  function calcAndRender() {
+    const car   = CARS.find(c=>c.id===sel) || CARS[0];
+    const ppl   = parseFloat(document.getElementById("ppl").value) || 164.9;
+    const mpg   = parseFloat(document.getElementById("mpg").value) || 45;
+    const fuel  = document.getElementById("fuelType").value;
+    const annual = getAnnual();
+
+    const fuelA  = annual * (1/(mpg*0.2199692)) * (ppl/100);
+    const kwhA   = annual / car.mpk;
+    const stdA   = kwhA * (STD_P/100);
+
+    const e7CarA  = kwhA * (E7_NIGHT/100);
+    const e7HomeA = (HOME_KWH*0.85*(E7_DAY/100)) + (HOME_KWH*0.15*(E7_NIGHT/100)) - (HOME_KWH*(STD_P/100));
+    const e7NetA  = e7CarA + e7HomeA;
+
+    const evCarA  = kwhA * (EV_NIGHT/100);
+    const evHomeA = (HOME_KWH*0.90*(EV_DAY/100)) + (HOME_KWH*0.10*(EV_NIGHT/100)) - (HOME_KWH*(STD_P/100));
+    const evNetA  = evCarA + evHomeA;
+
+    R = { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA };
+    renderResults();
+  }
+
+  /* ── RENDER RESULTS ── */
+  function renderResults() {
+    const { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA } = R;
+
+    const cheapest = stdA <= e7NetA ? "std" : "e7";
+    const midV     = cheapest==="std" ? stdA  : e7NetA;
+    const midLabel = cheapest==="std" ? "EV — standard rate" : "EV — Economy 7";
+    const midSub   = cheapest==="std" ? "at 24p/kWh" : "~9p overnight";
+
+    document.getElementById("tri").innerHTML = `
+      <div class="tc">
+        <div class="tcl">Your ${fuel}</div>
+        <div class="tcv">${fv(fuelA)}</div>
+        <div class="tcs">current cost</div>
+      </div>
+      <div class="tc" style="border:2px solid #FF7C00;">
+        <div class="badge badge-fix">cheapest fixed</div>
+        <div class="tcl">${midLabel}</div>
+        <div class="tcv" style="color:#FF7C00;">${fv(midV)}</div>
+        <div class="tcs">${midSub}</div>
+      </div>
+      <div class="tc" style="border:2px solid #0a7c4e;">
+        <div class="badge badge-best">lowest cost</div>
+        <div class="tcl">EV — smart tariff*</div>
+        <div class="tcv" style="color:#0a7c4e;">${fv(evNetA)}</div>
+        <div class="tcs">~7p overnight</div>
+      </div>`;
+
+    const bestSave = fuelA - evNetA;
+    const pos      = bestSave > 0;
+
+    const toggles = `<div class="hmt-wrap"><div class="hmt-bar"><div class="hmt${view==="m"?" on":""}" onclick="setView('m')">Monthly</div><div class="hmt${view==="a"?" on":""}" onclick="setView('a')">Annual</div></div></div>`;
+
+    document.getElementById("heroResult").innerHTML = pos
+      ? `<div class="hl">vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/yr</div>
+         <div class="hv">${fv(bestSave)}</div>
+         <div class="ha">${car.name} EV on a smart tariff</div>
+         ${toggles}`
+      : `<div class="hl">vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/yr</div>
+         <div class="hv" style="color:#f97c3c;">${fv(Math.abs(bestSave))}</div>
+         <div class="hs">more per ${view==="m"?"month":"year"} to charge — the right tariff could narrow that gap</div>
+         <div class="ha">${car.name} EV</div>
+         ${toggles}`;
+
+    const stCol = cheapest==="std" ? "#FF7C00" : "#d3b06b";
+    const e7Col = cheapest==="e7"  ? "#FF7C00" : "#d3b06b";
+    const maxV  = Math.max(fuelA, stdA) * 1.12;
+    const pct   = n => Math.min(n/maxV*70, 70).toFixed(1);
+
+    document.getElementById("bc").innerHTML = `
+      <div class="bw">
+        <div class="brow"><div class="bleft">⛽ ${fuel} fuel</div><div class="bright"><span class="bval">${fv(fuelA)}</span></div></div>
+        <div class="bt"><div class="bf" style="width:${pct(fuelA)}%;background:var(--navy);"></div></div>
+      </div>
+      <div class="bw">
+        <div class="brow">
+          <div class="bleft">⚡ EV — standard rate ${stCol==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div>
+          <div class="bright"><span class="bval">${fv(stdA)}</span></div>
+        </div>
+        <div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stCol};"></div></div>
+      </div>
+      <div class="bw">
+        <div class="brow">
+          <div class="bleft">⚡ EV — Economy 7 ${e7Col==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div>
+          <div class="bright"><span class="bval">${fv(e7NetA)}</span><span class="bchev" id="acc-e7-chev" onclick="toggleAcc('acc-e7')">▾</span></div>
+        </div>
+        <div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7Col};"></div></div>
+        <div class="acc" id="acc-e7">
+          <div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div>
+          <div class="acc-row">
+            <div class="adj-label"><span>Home rate adjustment</span>
+              <div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)">
+                <button class="tip-btn" type="button">i</button>
+                <div class="tooltip">${TOOLTIP}</div>
+              </div>
+            </div>
+            <span>+${fv(e7HomeA)}</span>
+          </div>
+          <div class="acc-row total"><span>Total</span><span>${fv(e7NetA)}</span></div>
+        </div>
+      </div>
+      <div class="bw" style="margin-bottom:6px;">
+        <div class="brow">
+          <div class="bleft">⚡ EV — smart tariff* <span style="background:#edfaf4;color:#0a7c4e;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">lowest cost</span></div>
+          <div class="bright"><span class="bval">${fv(evNetA)}</span><span class="bchev" id="acc-ev-chev" onclick="toggleAcc('acc-ev')">▾</span></div>
+        </div>
+        <div class="bt"><div class="bf" style="width:${pct(evNetA)}%;background:#0a7c4e;"></div></div>
+        <div class="acc" id="acc-ev">
+          <div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div>
+          <div class="acc-row">
+            <div class="adj-label"><span>Home rate adjustment</span>
+              <div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)">
+                <button class="tip-btn" type="button">i</button>
+                <div class="tooltip">${TOOLTIP}</div>
+              </div>
+            </div>
+            <span>+${fv(evHomeA)}</span>
+          </div>
+          <div class="acc-row total"><span>Total</span><span>${fv(evNetA)}</span></div>
+        </div>
+      </div>`;
+
+    document.getElementById("disc").textContent = "All figures are indicative, based on your inputs and typical real-world efficiency. Home rate adjustments assume average annual household usage of 2,700 kWh — 15% at night on Economy 7, 10% at night on a smart tariff. Fixed rate options are available on standard and Economy 7 tariffs. *A smart meter is typically required for EV smart tariffs.";
+  }
+
+  /* ── ACCORDION / TOOLTIP ── */
+  function toggleAcc(id) {
+    const a = document.getElementById(id), c = document.getElementById(id+"-chev");
+    if (!a) return;
+    const o = a.classList.contains("open");
+    a.classList.toggle("open",!o);
+    if (c) c.classList.toggle("open",!o);
+  }
+
+  function toggleBigAcc(id, btnId) {
+    const a = document.getElementById(id), b = document.getElementById(btnId);
+    if (!a) return;
+    const o = a.classList.contains("open");
+    a.classList.toggle("open",!o);
+    if (b) {
+      b.classList.toggle("open",!o);
+      b.querySelector("span:first-child").textContent = o ? "Show full cost breakdown" : "Hide full cost breakdown";
+    }
+  }
+
+  function toggleTip(id, e) {
+    if (e) e.stopPropagation();
+    document.querySelectorAll(".tip-wrap.show").forEach(el => { if (el.id!==id) el.classList.remove("show"); });
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("show");
+  }
+
+  document.addEventListener("click", () => document.querySelectorAll(".tip-wrap.show").forEach(el => el.classList.remove("show")));
+
+  /* ── INIT ── */
+  renderCars();
+  upd();
+</script>
+</body>
+</html>
