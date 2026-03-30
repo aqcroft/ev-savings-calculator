@@ -6,6 +6,7 @@
 <title>EV Running Cost Calculator | MWC Vehicle Contracts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
   /* ─── MWC TOKENS ─── */
@@ -77,7 +78,7 @@
   .calc-hdr h2 {
     font-size: 16px;
     font-weight: 700;
-    color: #f0d49a;
+    color: #7ec8f0;
     margin-bottom: 3px;
   }
 
@@ -237,8 +238,8 @@
   .cbtn.sel   { border-color: var(--blue); background: var(--blue-soft); }
 
   .cbtn .ico {
-    display: flex;
-    justify-content: center;
+    font-size: 26px;
+    display: block;
     margin-bottom: 8px;
     color: var(--ink-soft);
     transition: color 0.18s;
@@ -652,19 +653,13 @@
 
 <script>
   /* ── SVG ILLUSTRATIONS ── */
-  const SVGS = {
-    hatch:`<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 24 L4 18 Q4 16 6 16 L11 16 L18 8 Q20 6 24 6 L42 6 Q46 6 48 8 L54 16 L59 16 Q61 16 61 18 L61 24 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><rect x="22" y="7" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="33" y="7" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
-    exec: `<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 24 L3 19 Q3 17 5 17 L11 17 L19 9 Q21 7 25 7 L42 7 Q46 7 48 9 L54 17 L60 17 Q62 17 62 19 L62 24 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="24" r="4.5" stroke="currentColor" stroke-width="1.5"/><rect x="23" y="8" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="34" y="8" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
-    suv:  `<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 25 L3 17 Q3 15 5 15 L10 15 L15 7 Q17 5 21 5 L44 5 Q48 5 50 7 L55 15 L61 15 Q63 15 63 17 L63 25 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15" cy="25" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="25" r="5" stroke="currentColor" stroke-width="1.5"/><rect x="19" y="6" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="31" y="6" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
-    large:`<svg viewBox="0 0 64 32" width="52" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 25 L2 16 Q2 14 4 14 L9 14 L13 6 Q15 4 19 4 L46 4 Q50 4 52 6 L57 14 L62 14 Q64 14 62 16 L62 25 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="14" cy="25" r="5.5" stroke="currentColor" stroke-width="1.5"/><circle cx="50" cy="25" r="5.5" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="5" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="28" y="5" width="9" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/><rect x="39" y="5" width="7" height="8" rx="1" stroke="currentColor" stroke-width="1" opacity="0.45"/></svg>`,
-  };
 
   /* ── DATA ── */
   const CARS = [
-    { id:"hatch", name:"Family hatchback",   eg:"VW ID.3, Nissan Leaf",      mpk:3.8 },
-    { id:"exec",  name:"Executive saloon",   eg:"Tesla Model 3, BMW i4",     mpk:3.5 },
-    { id:"suv",   name:"Family SUV",          eg:"VW ID.4, Hyundai IONIQ 5",  mpk:3.2 },
-    { id:"large", name:"Large SUV / 7-seat",  eg:"Tesla Model Y, Kia EV9",    mpk:2.8 },
+    { id:"hatch", name:"Family hatchback",   eg:"VW ID.3, Nissan Leaf",      mpk:3.8, fa:"fa-solid fa-car-side"     },
+    { id:"exec",  name:"Executive saloon",   eg:"Tesla Model 3, BMW i4",     mpk:3.5, fa:"fa-solid fa-car-rear"     },
+    { id:"suv",   name:"Family SUV",          eg:"VW ID.4, Hyundai IONIQ 5",  mpk:3.2, fa:"fa-solid fa-truck-pickup" },
+    { id:"large", name:"Large SUV / 7-seat",  eg:"Tesla Model Y, Kia EV9",    mpk:2.8, fa:"fa-solid fa-van-shuttle"  },
   ];
 
   const PPL = { diesel:164.9, petrol:142.9 };
@@ -728,7 +723,7 @@
   function renderCars() {
     document.getElementById("carGrid").innerHTML = CARS.map(c => `
       <div class="cbtn${sel===c.id?" sel":""}" onclick="pick('${c.id}')">
-        <div class="ico">${SVGS[c.id]}</div>
+        <i class="${c.fa} ico"></i>
         <span class="cn">${c.name}</span>
         <span class="ce">${c.eg}</span>
         <span class="ck">~${c.mpk} mi/kWh</span>
