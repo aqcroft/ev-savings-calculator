@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,15 +10,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-  /* ─── MWC TOKENS ─── */
   :root {
     --navy:       #253B50;
     --navy-2:     #1c2e40;
     --blue:       #0071BA;
     --blue-2:     #005fa0;
     --blue-soft:  #e6f2fb;
-    --orange:     #FF7C00;   /* offer highlight */
-    --red:        #B23838;   /* offer highlight */
+    --orange:     #FF7C00;
+    --red:        #B23838;
     --green:      #0a7c4e;
     --green-soft: #edfaf4;
     --ink:        #1a2e4a;
@@ -52,7 +50,6 @@
     justify-content: center;
   }
 
-  /* ─── SHELL ─── */
   #evt {
     width: 100%;
     max-width: 480px;
@@ -62,7 +59,6 @@
     overflow: hidden;
   }
 
-  /* ─── HEADER ─── */
   .calc-hdr {
     background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
     color: white;
@@ -77,14 +73,8 @@
     margin-bottom: 14px;
   }
 
-  .calc-hdr h2 {
-    font-size: 16px;
-    font-weight: 700;
-    color: #7ec8f0;
-    margin-bottom: 3px;
-  }
-
-  .calc-hdr p { font-size: 12px; opacity: 0.65; }
+  .calc-hdr h2 { font-size: 16px; font-weight: 700; color: #7ec8f0; margin-bottom: 3px; }
+  .calc-hdr p  { font-size: 12px; opacity: 0.65; }
 
   .calc-hdr-top img {
     height: 47px;
@@ -115,13 +105,9 @@
   .calc-step.active { background: var(--blue); color: white; }
   .calc-step.done   { color: rgba(255,255,255,0.72); }
 
-  /* ─── BODY ─── */
   .calc-body { padding: 16px; }
 
-  .calc-body-inner {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
+  .calc-body-inner { display: grid; grid-template-columns: 1fr; }
 
   .calc-panel {
     grid-area: 1 / 1;
@@ -137,7 +123,6 @@
     z-index: 1;
   }
 
-  /* ─── FORM ELEMENTS ─── */
   .slbl {
     font-size: 10px;
     font-weight: 700;
@@ -183,12 +168,7 @@
   .fld input:focus, .fld select:focus { border-color: var(--blue); background: white; }
   .fld input.big { font-size: 17px; font-weight: 500; height: 44px; }
 
-  /* Mileage toggles */
-  .mtog {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 12px;
-  }
+  .mtog { display: flex; gap: 6px; margin-bottom: 12px; }
 
   .tb {
     flex: 1;
@@ -204,11 +184,7 @@
     transition: all 0.15s;
   }
 
-  .tb.active {
-    border-color: var(--blue);
-    background: var(--blue-soft);
-    color: var(--blue);
-  }
+  .tb.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
 
   .chip {
     display: inline-flex;
@@ -222,7 +198,6 @@
     margin-top: 7px;
   }
 
-  /* ─── EV CHOICE GRID ─── */
   .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 4px; }
 
   .cbtn {
@@ -238,22 +213,13 @@
 
   .cbtn:hover { border-color: rgba(0,113,186,0.34); transform: translateY(-1px); }
   .cbtn.sel   { border-color: var(--blue); background: var(--blue-soft); }
-
-  .cbtn .ico {
-    font-size: 26px;
-    display: block;
-    margin-bottom: 8px;
-    color: var(--ink-soft);
-    transition: color 0.18s;
-  }
-
+  .cbtn .ico  { font-size: 26px; display: block; margin-bottom: 8px; color: var(--ink-soft); transition: color 0.18s; }
   .cbtn.sel .ico { color: var(--blue); }
   .cbtn .cn { font-size: 12px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3; }
   .cbtn.sel .cn { color: var(--blue); }
   .cbtn .ce { font-size: 10px; color: var(--ink-soft); display: block; margin-top: 2px; line-height: 1.4; }
   .cbtn .ck { font-size: 11px; color: var(--orange); font-weight: 700; display: block; margin-top: 5px; }
 
-  /* ─── BUTTONS ─── */
   .btnp {
     width: 100%;
     height: 44px;
@@ -273,7 +239,6 @@
   .btnp:hover { background: var(--blue-2); }
   .btnp:active { transform: scale(0.99); }
 
-  /* ─── RESULTS ─── */
   .tri {
     display: grid;
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -311,7 +276,6 @@
   .badge-fix  { background: #fff3e0; color: var(--orange); }
   .badge-best { background: var(--green-soft); color: var(--green); }
 
-  /* ─── HERO RESULT ─── */
   .hero-result {
     background: linear-gradient(150deg, var(--blue) 0%, var(--blue-2) 100%);
     color: white;
@@ -327,7 +291,6 @@
   .hero-result .hs { font-size: 12px; color: white; margin-top: 4px; }
   .hero-result .ha { font-size: 12px; color: white; margin-top: 7px; font-weight: 700; }
 
-  /* ─── TOGGLE — centred wide pill ─── */
   .hmt-wrap {
     display: flex;
     justify-content: center;
@@ -337,7 +300,6 @@
 
   .hmt-bar {
     display: flex;
-    flex-direction: row;
     background: rgba(255,255,255,0.10);
     border-radius: 8px;
     width: 100%;
@@ -360,7 +322,6 @@
 
   .hmt.on { background: rgba(255,255,255,0.20); color: var(--orange); }
 
-  /* ─── BREAKDOWN ─── */
   .big-acc-toggle {
     display: flex;
     justify-content: space-between;
@@ -400,15 +361,7 @@
   .bt { height: 8px; background: rgba(26,46,74,0.08); border-radius: 5px; overflow: hidden; }
   .bf { height: 100%; border-radius: 5px; }
 
-  .acc {
-    display: none;
-    margin-top: 7px;
-    padding: 9px 9px 5px;
-    background: var(--surface-2);
-    border-radius: var(--r-sm);
-    border: 1px solid var(--line);
-  }
-
+  .acc { display: none; margin-top: 7px; padding: 9px 9px 5px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px solid var(--line); }
   .acc.open { display: block; }
 
   .acc-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); margin-bottom: 5px; gap: 8px; }
@@ -454,36 +407,6 @@
 
   .tip-wrap.show .tooltip { display: block; }
 
-  /* ─── UW BRIDGE ─── */
-  .uw-bridge {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    margin: 12px 0;
-    padding: 13px 15px;
-    background: var(--blue-soft);
-    border: 1px solid rgba(0,113,186,0.16);
-    border-radius: var(--r-lg);
-  }
-
-  .uw-bridge-text {
-    flex: 1; min-width: 0;
-    font-size: 12px;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-
-  .uw-bridge-text a { color: var(--blue); font-weight: 700; text-decoration: underline; }
-
-  .uw-bridge-logo {
-    flex: 0 0 72px;
-    width: 72px;
-    height: auto;
-    object-fit: contain;
-    margin-left: auto;
-  }
-
   /* ─── CTA ─── */
   .calc-cta {
     background: linear-gradient(150deg, var(--blue) 0%, var(--blue-2) 100%);
@@ -491,19 +414,46 @@
     border-radius: var(--r-lg);
     padding: 16px;
     margin-bottom: 12px;
-    text-align: center;
     box-shadow: var(--sh-md);
   }
 
-  .calc-cta h3 { font-size: 14px; font-weight: 700; color: #f0d49a; margin-bottom: 6px; }
-  .calc-cta p  { font-size: 12px; color: white; line-height: 1.55; margin-bottom: 14px; }
+  .calc-cta h3 { font-size: 14px; font-weight: 700; color: #f0d49a; margin-bottom: 10px; text-align: center; }
+
+  /* Option B: copy + UW logo side by side, then buttons below */
+  .cta-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .cta-body p {
+    flex: 1;
+    font-size: 12px;
+    color: white;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .cta-uw-logo {
+    flex-shrink: 0;
+    width: 64px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .cta-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 
   .ctab {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 42px;
-    padding: 0 28px;
+    padding: 0 22px;
     background: var(--orange);
     color: white;
     border: none;
@@ -515,9 +465,10 @@
     text-decoration: none;
     box-shadow: 0 4px 14px rgba(255,124,0,0.30);
     transition: background 0.15s, transform 0.1s;
+    flex: 1;
   }
 
-  .ctab:hover { background: #e06e00; transform: translateY(-1px); }
+  .ctab:hover { transform: translateY(-1px); }
 
   .disc {
     font-size: 10px;
@@ -530,24 +481,9 @@
   .hide { display: none !important; }
 
   /* ─── STEPPERS ─── */
-  .input-stepper {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    width: 100%;
-  }
-
-  .input-stepper input {
-    flex: 1;
-    border-radius: var(--r-sm) 0 0 var(--r-sm) !important;
-    border-right: none !important;
-  }
-
-  .stepper-btns {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-  }
+  .input-stepper { display: flex; align-items: stretch; width: 100%; }
+  .input-stepper input { flex: 1; border-radius: var(--r-sm) 0 0 var(--r-sm) !important; border-right: none !important; }
+  .stepper-btns { display: flex; flex-direction: column; flex-shrink: 0; }
 
   .stepper-btns button {
     width: 32px;
@@ -566,20 +502,9 @@
     line-height: 1;
   }
 
-  .stepper-btns button:first-child {
-    border-radius: 0 var(--r-sm) 0 0;
-    border-bottom: none;
-  }
-
-  .stepper-btns button:last-child {
-    border-radius: 0 0 var(--r-sm) 0;
-  }
-
-  .stepper-btns button:hover {
-    background: var(--blue-soft);
-    color: var(--blue);
-    border-color: var(--blue);
-  }
+  .stepper-btns button:first-child { border-radius: 0 var(--r-sm) 0 0; border-bottom: none; }
+  .stepper-btns button:last-child  { border-radius: 0 0 var(--r-sm) 0; }
+  .stepper-btns button:hover { background: var(--blue-soft); color: var(--blue); border-color: var(--blue); }
 
   @media (max-width: 520px) {
     body { padding: 0; background: transparent; }
@@ -590,7 +515,6 @@
     .tcl { font-size: 8px; }
     .tcv { font-size: 14px; }
     .hero-result .hv { font-size: 32px; }
-    .uw-bridge { flex-direction: row; align-items: center; }
   }
 </style>
 </head>
@@ -603,7 +527,6 @@
         <h2>EV Running Cost Calculator</h2>
         <p>See what switching to electric could save you every month</p>
       </div>
-      <!-- MWC logo -->
       <img src="assets/MWC_square.webp" alt="MWC Vehicle Contracts" />
     </div>
     <div class="calc-steps">
@@ -616,7 +539,7 @@
   <div class="calc-body">
     <div class="calc-body-inner">
 
-      <!-- ── STEP 1: Car + Mileage ── -->
+      <!-- STEP 1 -->
       <div class="calc-panel active" id="s1">
         <div class="slbl">What are you driving now?</div>
         <div class="card">
@@ -650,7 +573,6 @@
             </div>
           </div>
           <div class="chip" style="margin-bottom:12px;">💡 Not sure? Diesel ~45 mpg · Petrol ~35 mpg</div>
-
           <div style="border-top:1px solid var(--line);margin:0 -14px;padding:12px 14px 0;">
             <div class="slbl" style="margin-bottom:8px;">How many miles do you drive?</div>
             <div class="mtog">
@@ -694,7 +616,7 @@
         <button class="btnp" onclick="go(2)">Next: Choose your EV →</button>
       </div>
 
-      <!-- ── STEP 2: EV Choice ── -->
+      <!-- STEP 2 -->
       <div class="calc-panel" id="s2">
         <div class="slbl">What kind of EV are you thinking about?</div>
         <div class="cgrid" id="carGrid"></div>
@@ -702,7 +624,7 @@
         <button class="btnp" onclick="go(3)">Calculate our saving →</button>
       </div>
 
-      <!-- ── STEP 3: Results ── -->
+      <!-- STEP 3 -->
       <div class="calc-panel" id="s3">
         <div class="tri" id="tri"></div>
         <div id="heroResult" class="hero-result"></div>
@@ -715,16 +637,16 @@
 
         <div class="calc-cta">
           <h3>Ready to explore your options?</h3>
-          <p>Our team can find the right EV lease for your budget. We also work with Utility Warehouse to get you set up on the best home charging tariff — so your saving is real from day one.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-            <a id="mwc-wa" href="https://wa.me/447802433727" target="_blank" rel="noopener" class="ctab" style="background:#25D366;box-shadow:0 4px 14px rgba(37,211,102,0.28);">WhatsApp</a>
-            <a href="tel:03332301625" class="ctab">Call</a>
-            <a id="mwc-email" href="mailto:joespinks@mwvc.co.uk" class="ctab" style="background:var(--blue-2);">Email</a>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.15);">
-            <a href="https://connectors.uw.co.uk/CN-25OW" target="_blank" rel="noopener" style="flex-shrink:0;">
-              <img src="assets/UW_logo.webp" alt="Utility Warehouse" class="uw-bridge-logo"/>
+          <div class="cta-body">
+            <p>Our team can find the right EV lease for your budget. We also work with Utility Warehouse to get you set up on the best home charging tariff — so your saving is real from day one.</p>
+            <a href="https://connectors.uw.co.uk/CN-25OW" target="_blank" rel="noopener">
+              <img src="assets/UW_logo.webp" alt="Utility Warehouse" class="cta-uw-logo"/>
             </a>
+          </div>
+          <div class="cta-btns">
+            <a id="mwc-wa"    href="https://wa.me/447802433727" target="_blank" rel="noopener" class="ctab" style="background:#25D366;box-shadow:0 4px 14px rgba(37,211,102,0.28);">WhatsApp</a>
+            <a                href="tel:03332301625"            class="ctab">Call</a>
+            <a id="mwc-email" href="mailto:joespinks@mwvc.co.uk" class="ctab" style="background:var(--blue-2);box-shadow:none;">Email</a>
           </div>
         </div>
 
@@ -736,14 +658,11 @@
 </div>
 
 <script>
-  /* ── SVG ILLUSTRATIONS ── */
-
-  /* ── DATA ── */
   const CARS = [
-    { id:"hatch", name:"Family hatchback",   eg:"VW ID.3, Nissan Leaf",      mpk:3.8, fa:"fa-solid fa-car-side"     },
-    { id:"exec",  name:"Executive saloon",   eg:"Tesla Model 3, BMW i4",     mpk:3.5, fa:"fa-solid fa-car-rear"     },
-    { id:"suv",   name:"Family SUV",          eg:"VW ID.4, Hyundai IONIQ 5",  mpk:3.2, fa:"fa-solid fa-truck-pickup" },
-    { id:"large", name:"Large SUV / 7-seat",  eg:"Tesla Model Y, Kia EV9",    mpk:2.8, fa:"fa-solid fa-van-shuttle"  },
+    { id:"hatch", name:"Family hatchback",  eg:"VW ID.3, Nissan Leaf",     mpk:3.8, fa:"fa-solid fa-car-side"     },
+    { id:"exec",  name:"Executive saloon",  eg:"Tesla Model 3, BMW i4",    mpk:3.5, fa:"fa-solid fa-car-rear"     },
+    { id:"suv",   name:"Family SUV",         eg:"VW ID.4, Hyundai IONIQ 5", mpk:3.2, fa:"fa-solid fa-truck-pickup" },
+    { id:"large", name:"Large SUV / 7-seat", eg:"Tesla Model Y, Kia EV9",   mpk:2.8, fa:"fa-solid fa-van-shuttle"  },
   ];
 
   const PPL = { diesel:164.9, petrol:142.9 };
@@ -752,81 +671,49 @@
 
   let sel="hatch", mMode="a", view="m", R={};
 
-  /* ── STEP NAV ── */
   function go(n) {
-    ["s1","s2","s3"].forEach((id,i) => {
-      const p = document.getElementById(id);
-      if (p) p.classList.toggle("active", i+1===n);
-    });
-    ["p1","p2","p3"].forEach((id,i) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove("active","done");
-      if (i+1 < n)  el.classList.add("done");
-      if (i+1 === n) el.classList.add("active");
-    });
+    ["s1","s2","s3"].forEach((id,i) => { const p=document.getElementById(id); if(p) p.classList.toggle("active",i+1===n); });
+    ["p1","p2","p3"].forEach((id,i) => { const el=document.getElementById(id); if(!el) return; el.classList.remove("active","done"); if(i+1<n) el.classList.add("done"); if(i+1===n) el.classList.add("active"); });
     if (n===3) calcAndRender();
   }
 
-  /* ── FUEL / MPG ── */
   function updatePPL() {
     const ft = document.getElementById("fuelType").value;
     document.getElementById("ppl").value = PPL[ft];
     document.getElementById("mpg").value = ft==="diesel" ? 45 : 35;
   }
 
-  /* ── MILEAGE ── */
-  function fmtMiles(el) {
-    const r = el.value.replace(/[^0-9]/g,"");
-    if (r) el.value = parseInt(r,10).toLocaleString("en-GB");
-  }
+  function fmtMiles(el) { const r=el.value.replace(/[^0-9]/g,""); if(r) el.value=parseInt(r,10).toLocaleString("en-GB"); }
 
   function swm(m) {
     mMode = m;
-    ["a","w","d"].forEach(x => {
-      document.getElementById("tb-"+x).classList.toggle("active", x===m);
-      document.getElementById("f"+x).classList.toggle("hide", x!==m);
-    });
+    ["a","w","d"].forEach(x => { document.getElementById("tb-"+x).classList.toggle("active",x===m); document.getElementById("f"+x).classList.toggle("hide",x!==m); });
     upd();
   }
 
   function getAnnual() {
-    const clean = id => parseFloat((document.getElementById(id).value||"0").replace(/,/g,""))||0;
-    if (mMode==="a") return clean("mA") || 10000;
-    if (mMode==="w") return (clean("mW") || 200) * 52;
-    return (clean("mD") || 40) * 235;
+    const c = id => parseFloat((document.getElementById(id).value||"0").replace(/,/g,""))||0;
+    if (mMode==="a") return c("mA")||10000;
+    if (mMode==="w") return (c("mW")||200)*52;
+    return (c("mD")||40)*235;
   }
 
   function upd() {
-    const a = getAnnual();
-    const el = document.getElementById("meq");
-    if (el) el.textContent = "≈ " + Math.round(a).toLocaleString("en-GB") + " miles/year · " + Math.round(a/12).toLocaleString("en-GB") + " miles/month";
+    const a=getAnnual(), el=document.getElementById("meq");
+    if(el) el.textContent="≈ "+Math.round(a).toLocaleString("en-GB")+" miles/year · "+Math.round(a/12).toLocaleString("en-GB")+" miles/month";
   }
 
-  /* ── STEPPERS ── */
-  function stepVal(id, dir, step, min, max, keepDecimal) {
-    const el = document.getElementById(id);
-    let val = parseFloat(el.value) || 0;
-    if (keepDecimal) {
-      // preserve the .9 — step the integer part only
-      const dec = val - Math.floor(val);
-      val = Math.round(Math.floor(val) + dir * step) + dec;
-    } else {
-      val = Math.round(val + dir * step);
-    }
-    val = Math.max(min, Math.min(max, val));
-    el.value = keepDecimal ? val.toFixed(1) : val;
+  function stepVal(id,dir,step,min,max,keepDecimal) {
+    const el=document.getElementById(id); let val=parseFloat(el.value)||0;
+    if(keepDecimal){ const dec=val-Math.floor(val); val=Math.round(Math.floor(val)+dir*step)+dec; } else { val=Math.round(val+dir*step); }
+    val=Math.max(min,Math.min(max,val)); el.value=keepDecimal?val.toFixed(1):val;
   }
 
-  function stepMiles(id, step) {
-    const el = document.getElementById(id);
-    let val = parseFloat((el.value || "0").replace(/,/g, "")) || 0;
-    val = Math.max(0, val + step);
-    el.value = val.toLocaleString("en-GB");
-    upd();
+  function stepMiles(id,step) {
+    const el=document.getElementById(id); let val=parseFloat((el.value||"0").replace(/,/g,""))||0;
+    val=Math.max(0,val+step); el.value=val.toLocaleString("en-GB"); upd();
   }
 
-  /* ── EV GRID ── */
   function renderCars() {
     document.getElementById("carGrid").innerHTML = CARS.map(c => `
       <div class="cbtn${sel===c.id?" sel":""}" onclick="pick('${c.id}')">
@@ -839,195 +726,78 @@
 
   function pick(id) { sel=id; renderCars(); }
 
-  /* ── VIEW TOGGLE ── */
-  function setView(v) {
-    view = v;
-    if (Object.keys(R).length) renderResults();
-  }
+  function setView(v) { view=v; if(Object.keys(R).length) renderResults(); }
 
-  function f(n)   { return "£" + Math.round(n).toLocaleString("en-GB"); }
-  function fv(n)  { return view==="m" ? f(n/12)+"/m" : f(n)+"/y"; }
+  function f(n)  { return "£"+Math.round(n).toLocaleString("en-GB"); }
+  function fv(n) { return view==="m" ? f(n/12)+"/m" : f(n)+"/y"; }
 
-  /* ── CALC ── */
   function calcAndRender() {
-    const car   = CARS.find(c=>c.id===sel) || CARS[0];
-    const ppl   = parseFloat(document.getElementById("ppl").value) || 164.9;
-    const mpg   = parseFloat(document.getElementById("mpg").value) || 45;
-    const fuel  = document.getElementById("fuelType").value;
-    const annual = getAnnual();
-
-    const fuelA  = annual * (1/(mpg*0.2199692)) * (ppl/100);
-    const kwhA   = annual / car.mpk;
-    const stdA   = kwhA * (STD_P/100);
-
-    const e7CarA  = kwhA * (E7_NIGHT/100);
-    const e7HomeA = (HOME_KWH*0.85*(E7_DAY/100)) + (HOME_KWH*0.15*(E7_NIGHT/100)) - (HOME_KWH*(STD_P/100));
-    const e7NetA  = e7CarA + e7HomeA;
-
-    const evCarA  = kwhA * (EV_NIGHT/100);
-    const evHomeA = (HOME_KWH*0.90*(EV_DAY/100)) + (HOME_KWH*0.10*(EV_NIGHT/100)) - (HOME_KWH*(STD_P/100));
-    const evNetA  = evCarA + evHomeA;
-
-    R = { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA };
+    const car=CARS.find(c=>c.id===sel)||CARS[0];
+    const ppl=parseFloat(document.getElementById("ppl").value)||164.9;
+    const mpg=parseFloat(document.getElementById("mpg").value)||45;
+    const fuel=document.getElementById("fuelType").value;
+    const annual=getAnnual();
+    const fuelA=annual*(1/(mpg*0.2199692))*(ppl/100);
+    const kwhA=annual/car.mpk, stdA=kwhA*(STD_P/100);
+    const e7CarA=kwhA*(E7_NIGHT/100), e7HomeA=(HOME_KWH*0.85*(E7_DAY/100))+(HOME_KWH*0.15*(E7_NIGHT/100))-(HOME_KWH*(STD_P/100)), e7NetA=e7CarA+e7HomeA;
+    const evCarA=kwhA*(EV_NIGHT/100), evHomeA=(HOME_KWH*0.90*(EV_DAY/100))+(HOME_KWH*0.10*(EV_NIGHT/100))-(HOME_KWH*(STD_P/100)), evNetA=evCarA+evHomeA;
+    R={car,fuel,annual,kwhA,fuelA,stdA,e7NetA,e7CarA,e7HomeA,evNetA,evCarA,evHomeA};
     renderResults();
     buildContactLinks();
   }
 
-  function buildContactLinks(){
+  function buildContactLinks() {
     if(!Object.keys(R).length) return;
     const {car,fuel,annual,fuelA,stdA,e7NetA,evNetA}=R;
-    const saving=fuelA-evNetA;
-    const smartM=Math.round((fuelA-evNetA)/12),fixedM=Math.round((fuelA-Math.min(stdA,e7NetA))/12),stdM=Math.round((fuelA-stdA)/12);
-    const savingStr=saving>0?"a potential saving of £"+Math.round(saving/12)+"/month":"broadly similar running costs";
+    const smartM=Math.round((fuelA-evNetA)/12), fixedM=Math.round((fuelA-Math.min(stdA,e7NetA))/12), stdM=Math.round((fuelA-stdA)/12);
     const msg="Hi — I've just used the MWC EV calculator and I'd like to find out more.\n\n"
       +"My current car: "+fuel+", "+Math.round(annual).toLocaleString("en-GB")+" miles/year\n"
       +"Fuel economy: "+document.getElementById("mpg").value+" MPG at "+document.getElementById("ppl").value+"p/l\n"
       +"EV I looked at: "+car.name+"\n"
       +"Potential EV Tariff Savings: £"+smartM+"/m smart; £"+fixedM+"/m Fixed; £"+stdM+"/m Standard";
-    const waEl=document.getElementById("mwc-wa");
-    const emEl=document.getElementById("mwc-email");
+    const waEl=document.getElementById("mwc-wa"), emEl=document.getElementById("mwc-email");
     if(waEl) waEl.href="https://wa.me/447802433727?text="+encodeURIComponent(msg);
     if(emEl) emEl.href="mailto:joespinks@mwvc.co.uk?subject="+encodeURIComponent("MWC EV Calculator Enquiry")+"&body="+encodeURIComponent(msg);
   }
 
-  /* ── RENDER RESULTS ── */
   function renderResults() {
-    const { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA } = R;
+    const {car,fuel,annual,kwhA,fuelA,stdA,e7NetA,e7CarA,e7HomeA,evNetA,evCarA,evHomeA}=R;
+    const cheapest=stdA<=e7NetA?"std":"e7";
+    const midV=cheapest==="std"?stdA:e7NetA, midLabel=cheapest==="std"?"EV — standard rate":"EV — Economy 7", midSub=cheapest==="std"?"at 24p/kWh":"~9p overnight";
 
-    const cheapest = stdA <= e7NetA ? "std" : "e7";
-    const midV     = cheapest==="std" ? stdA  : e7NetA;
-    const midLabel = cheapest==="std" ? "EV — standard rate" : "EV — Economy 7";
-    const midSub   = cheapest==="std" ? "at 24p/kWh" : "~9p overnight";
+    document.getElementById("tri").innerHTML=`
+      <div class="tc"><div class="tcl">Your ${fuel}</div><div class="tcv">${fv(fuelA)}</div><div class="tcs">current cost</div></div>
+      <div class="tc" style="border:2px solid #FF7C00;"><div class="badge badge-fix">cheapest fixed</div><div class="tcl">${midLabel}</div><div class="tcv" style="color:#FF7C00;">${fv(midV)}</div><div class="tcs">${midSub}</div></div>
+      <div class="tc" style="border:2px solid #0a7c4e;"><div class="badge badge-best">lowest cost</div><div class="tcl">EV — smart tariff*</div><div class="tcv" style="color:#0a7c4e;">${fv(evNetA)}</div><div class="tcs">~7p overnight</div></div>`;
 
-    document.getElementById("tri").innerHTML = `
-      <div class="tc">
-        <div class="tcl">Your ${fuel}</div>
-        <div class="tcv">${fv(fuelA)}</div>
-        <div class="tcs">current cost</div>
-      </div>
-      <div class="tc" style="border:2px solid #FF7C00;">
-        <div class="badge badge-fix">cheapest fixed</div>
-        <div class="tcl">${midLabel}</div>
-        <div class="tcv" style="color:#FF7C00;">${fv(midV)}</div>
-        <div class="tcs">${midSub}</div>
-      </div>
-      <div class="tc" style="border:2px solid #0a7c4e;">
-        <div class="badge badge-best">lowest cost</div>
-        <div class="tcl">EV — smart tariff*</div>
-        <div class="tcv" style="color:#0a7c4e;">${fv(evNetA)}</div>
-        <div class="tcs">~7p overnight</div>
-      </div>`;
+    const bestSave=fuelA-evNetA, pos=bestSave>0;
+    const toggles=`<div class="hmt-wrap"><div class="hmt-bar"><div class="hmt${view==="m"?" on":""}" onclick="setView('m')">Monthly</div><div class="hmt${view==="a"?" on":""}" onclick="setView('a')">Annual</div></div></div>`;
 
-    const bestSave = fuelA - evNetA;
-    const pos      = bestSave > 0;
+    document.getElementById("heroResult").innerHTML=pos
+      ?`<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div><div class="hv">${fv(bestSave)}</div><div class="ha">${car.name} EV on a smart tariff</div>${toggles}`
+      :`<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div><div class="hv" style="color:#f97c3c;">${fv(Math.abs(bestSave))}</div><div class="hs">more per ${view==="m"?"month":"year"} to charge — the right tariff could narrow that gap</div><div class="ha">${car.name} EV</div>${toggles}`;
 
-    const toggles = `<div class="hmt-wrap"><div class="hmt-bar"><div class="hmt${view==="m"?" on":""}" onclick="setView('m')">Monthly</div><div class="hmt${view==="a"?" on":""}" onclick="setView('a')">Annual</div></div></div>`;
+    const stCol=cheapest==="std"?"#FF7C00":"#0071BA", e7Col=cheapest==="e7"?"#FF7C00":"#0071BA";
+    const maxV=Math.max(fuelA,stdA)*1.12, pct=n=>Math.min(n/maxV*70,70).toFixed(1);
 
-    document.getElementById("heroResult").innerHTML = pos
-      ? `<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div>
-         <div class="hv">${fv(bestSave)}</div>
-         <div class="ha">${car.name} EV on a smart tariff</div>
-         ${toggles}`
-      : `<div class="hl">Estimated savings vs your current ${fuel} · ${Math.round(annual).toLocaleString("en-GB")} miles/y</div>
-         <div class="hv" style="color:#f97c3c;">${fv(Math.abs(bestSave))}</div>
-         <div class="hs">more per ${view==="m"?"month":"year"} to charge — the right tariff could narrow that gap</div>
-         <div class="ha">${car.name} EV</div>
-         ${toggles}`;
+    document.getElementById("bc").innerHTML=`
+      <div class="bw"><div class="brow"><div class="bleft">⛽ ${fuel} fuel</div><div class="bright"><span class="bval">${fv(fuelA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(fuelA)}%;background:var(--navy);"></div></div></div>
+      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — standard rate ${stCol==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div><div class="bright"><span class="bval">${fv(stdA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stCol};"></div></div></div>
+      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — Economy 7 ${e7Col==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div><div class="bright"><span class="bval">${fv(e7NetA)}</span><span class="bchev" id="acc-e7-chev" onclick="toggleAcc('acc-e7')">▾</span></div></div><div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7Col};"></div></div>
+        <div class="acc" id="acc-e7"><div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(e7HomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(e7NetA)}</span></div></div></div>
+      <div class="bw" style="margin-bottom:6px;"><div class="brow"><div class="bleft">⚡ EV — smart tariff* <span style="background:#edfaf4;color:#0a7c4e;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">lowest cost</span></div><div class="bright"><span class="bval">${fv(evNetA)}</span><span class="bchev" id="acc-ev-chev" onclick="toggleAcc('acc-ev')">▾</span></div></div><div class="bt"><div class="bf" style="width:${pct(evNetA)}%;background:#0a7c4e;"></div></div>
+        <div class="acc" id="acc-ev"><div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(evHomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(evNetA)}</span></div></div></div>`;
 
-    const stCol = cheapest==="std" ? "#FF7C00" : "#0071BA";
-    const e7Col = cheapest==="e7"  ? "#FF7C00" : "#0071BA";
-    const maxV  = Math.max(fuelA, stdA) * 1.12;
-    const pct   = n => Math.min(n/maxV*70, 70).toFixed(1);
-
-    document.getElementById("bc").innerHTML = `
-      <div class="bw">
-        <div class="brow"><div class="bleft">⛽ ${fuel} fuel</div><div class="bright"><span class="bval">${fv(fuelA)}</span></div></div>
-        <div class="bt"><div class="bf" style="width:${pct(fuelA)}%;background:var(--navy);"></div></div>
-      </div>
-      <div class="bw">
-        <div class="brow">
-          <div class="bleft">⚡ EV — standard rate ${stCol==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div>
-          <div class="bright"><span class="bval">${fv(stdA)}</span></div>
-        </div>
-        <div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stCol};"></div></div>
-      </div>
-      <div class="bw">
-        <div class="brow">
-          <div class="bleft">⚡ EV — Economy 7 ${e7Col==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">cheapest fixed</span>':''}</div>
-          <div class="bright"><span class="bval">${fv(e7NetA)}</span><span class="bchev" id="acc-e7-chev" onclick="toggleAcc('acc-e7')">▾</span></div>
-        </div>
-        <div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7Col};"></div></div>
-        <div class="acc" id="acc-e7">
-          <div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div>
-          <div class="acc-row">
-            <div class="adj-label"><span>Home rate adjustment</span>
-              <div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)">
-                <button class="tip-btn" type="button">i</button>
-                <div class="tooltip">${TOOLTIP}</div>
-              </div>
-            </div>
-            <span>+${fv(e7HomeA)}</span>
-          </div>
-          <div class="acc-row total"><span>Total</span><span>${fv(e7NetA)}</span></div>
-        </div>
-      </div>
-      <div class="bw" style="margin-bottom:6px;">
-        <div class="brow">
-          <div class="bleft">⚡ EV — smart tariff* <span style="background:#edfaf4;color:#0a7c4e;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;margin-left:3px;">lowest cost</span></div>
-          <div class="bright"><span class="bval">${fv(evNetA)}</span><span class="bchev" id="acc-ev-chev" onclick="toggleAcc('acc-ev')">▾</span></div>
-        </div>
-        <div class="bt"><div class="bf" style="width:${pct(evNetA)}%;background:#0a7c4e;"></div></div>
-        <div class="acc" id="acc-ev">
-          <div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div>
-          <div class="acc-row">
-            <div class="adj-label"><span>Home rate adjustment</span>
-              <div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)">
-                <button class="tip-btn" type="button">i</button>
-                <div class="tooltip">${TOOLTIP}</div>
-              </div>
-            </div>
-            <span>+${fv(evHomeA)}</span>
-          </div>
-          <div class="acc-row total"><span>Total</span><span>${fv(evNetA)}</span></div>
-        </div>
-      </div>`;
-
-    document.getElementById("disc").textContent = "All figures are indicative, based on your inputs and typical real-world efficiency. Home rate adjustments assume average annual household usage of 2,700 kWh — 15% at night on Economy 7, 10% at night on a smart tariff. Fixed rate options are available on standard and Economy 7 tariffs. *A smart meter is typically required for EV smart tariffs.";
+    document.getElementById("disc").textContent="All figures are indicative, based on your inputs and typical real-world efficiency. Home rate adjustments assume average annual household usage of 2,700 kWh — 15% at night on Economy 7, 10% at night on a smart tariff. Fixed rate options are available on standard and Economy 7 tariffs. *A smart meter is typically required for EV smart tariffs.";
   }
 
-  /* ── ACCORDION / TOOLTIP ── */
-  function toggleAcc(id) {
-    const a = document.getElementById(id), c = document.getElementById(id+"-chev");
-    if (!a) return;
-    const o = a.classList.contains("open");
-    a.classList.toggle("open",!o);
-    if (c) c.classList.toggle("open",!o);
-  }
+  function toggleAcc(id) { const a=document.getElementById(id),c=document.getElementById(id+"-chev"); if(!a) return; const o=a.classList.contains("open"); a.classList.toggle("open",!o); if(c) c.classList.toggle("open",!o); }
+  function toggleBigAcc(id,btnId) { const a=document.getElementById(id),b=document.getElementById(btnId); if(!a) return; const o=a.classList.contains("open"); a.classList.toggle("open",!o); if(b){ b.classList.toggle("open",!o); b.querySelector("span:first-child").textContent=o?"Show full cost breakdown":"Hide full cost breakdown"; } }
+  function toggleTip(id,e) { if(e) e.stopPropagation(); document.querySelectorAll(".tip-wrap.show").forEach(el=>{if(el.id!==id) el.classList.remove("show");}); const el=document.getElementById(id); if(el) el.classList.toggle("show"); }
+  document.addEventListener("click",()=>document.querySelectorAll(".tip-wrap.show").forEach(el=>el.classList.remove("show")));
 
-  function toggleBigAcc(id, btnId) {
-    const a = document.getElementById(id), b = document.getElementById(btnId);
-    if (!a) return;
-    const o = a.classList.contains("open");
-    a.classList.toggle("open",!o);
-    if (b) {
-      b.classList.toggle("open",!o);
-      b.querySelector("span:first-child").textContent = o ? "Show full cost breakdown" : "Hide full cost breakdown";
-    }
-  }
-
-  function toggleTip(id, e) {
-    if (e) e.stopPropagation();
-    document.querySelectorAll(".tip-wrap.show").forEach(el => { if (el.id!==id) el.classList.remove("show"); });
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle("show");
-  }
-
-  document.addEventListener("click", () => document.querySelectorAll(".tip-wrap.show").forEach(el => el.classList.remove("show")));
-
-  /* ── INIT ── */
   renderCars();
   upd();
 </script>
 </body>
 </html>
-
