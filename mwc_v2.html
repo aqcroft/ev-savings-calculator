@@ -357,7 +357,7 @@
     line-height: 1.3;
   }
 
-  .hmt.on { background: rgba(255,255,255,0.20); color: white; }
+  .hmt.on { background: rgba(255,255,255,0.20); color: var(--orange); }
 
   /* ─── BREAKDOWN ─── */
   .big-acc-toggle {
@@ -715,8 +715,12 @@
         <div class="calc-cta">
           <h3>Ready to explore your options?</h3>
           <p>Our team can find the right EV lease for your budget. We also work with Utility Warehouse to get you set up on the best home charging tariff — so your saving is real from day one.</p>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:4px;">
-            <a class="ctab" href="tel:03304042193">Talk to an adviser</a>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <a id="mwc-wa" href="https://wa.me/447802433727" target="_blank" rel="noopener" class="ctab" style="background:#25D366;box-shadow:0 4px 14px rgba(37,211,102,0.28);">WhatsApp</a>
+            <a href="tel:03332301625" class="ctab">Call</a>
+            <a id="mwc-email" href="mailto:joespinks@mwvc.co.uk" class="ctab" style="background:var(--blue-2);">Email</a>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.15);">
             <a href="https://connectors.uw.co.uk/CN-25OW" target="_blank" rel="noopener" style="flex-shrink:0;">
               <img src="assets/UW_logo.webp" alt="Utility Warehouse" class="uw-bridge-logo"/>
             </a>
@@ -865,6 +869,24 @@
 
     R = { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA };
     renderResults();
+    buildContactLinks();
+  }
+
+  function buildContactLinks(){
+    if(!Object.keys(R).length) return;
+    const {car,fuel,annual,fuelA,stdA,e7NetA,evNetA}=R;
+    const saving=fuelA-evNetA;
+    const smartM=Math.round((fuelA-evNetA)/12),fixedM=Math.round((fuelA-Math.min(stdA,e7NetA))/12),stdM=Math.round((fuelA-stdA)/12);
+    const savingStr=saving>0?"a potential saving of £"+Math.round(saving/12)+"/month":"broadly similar running costs";
+    const msg="Hi — I've just used the MWC EV calculator and I'd like to find out more.\n\n"
+      +"My current car: "+fuel+", "+Math.round(annual).toLocaleString("en-GB")+" miles/year\n"
+      +"Fuel economy: "+document.getElementById("mpg").value+" MPG at "+document.getElementById("ppl").value+"p/l\n"
+      +"EV I looked at: "+car.name+"\n"
+      +"Potential EV Tariff Savings: £"+smartM+"/m smart; £"+fixedM+"/m Fixed; £"+stdM+"/m Standard";
+    const waEl=document.getElementById("mwc-wa");
+    const emEl=document.getElementById("mwc-email");
+    if(waEl) waEl.href="https://wa.me/447802433727?text="+encodeURIComponent(msg);
+    if(emEl) emEl.href="mailto:joespinks@mwvc.co.uk?subject="+encodeURIComponent("MWC EV Calculator Enquiry")+"&body="+encodeURIComponent(msg);
   }
 
   /* ── RENDER RESULTS ── */
@@ -1007,3 +1029,4 @@
 </script>
 </body>
 </html>
+
