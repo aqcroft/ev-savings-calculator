@@ -366,7 +366,8 @@
 
   .acc-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); margin-bottom: 5px; gap: 8px; }
   .acc-row span:last-child { font-family: "DM Mono", monospace; font-weight: 500; color: var(--ink); font-size: 11px; white-space: nowrap; }
-  .acc-row.total { border-top: 1px solid var(--line); padding-top: 5px; margin-top: 2px; font-weight: 700; color: var(--ink); }
+  .acc-row.total { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; font-weight: 800; color: var(--ink); font-size: 12px; }
+  .acc-row.total span:last-child { font-weight: 800; font-size: 12px; }
 
   .adj-label { display: flex; align-items: center; gap: 5px; }
   .tip-wrap  { position: relative; display: inline-flex; }
@@ -813,14 +814,24 @@
     const stCol=cheapest==="std"?"#FF7C00":"#0071BA", e7Col=cheapest==="e7"?"#FF7C00":"#0071BA";
     const maxV=Math.max(fuelA,stdA)*1.12, pct=n=>Math.min(n/maxV*70,70).toFixed(1);
 
+    // Dynamic tints follow bar colour
+    const stdIsOrange = stCol==="#FF7C00";
+    const e7IsOrange  = e7Col==="#FF7C00";
+    const stdTintBg   = stdIsOrange ? "#fff8f0" : "#e6f2fb";
+    const stdTintBd   = stdIsOrange ? "rgba(255,124,0,0.22)" : "rgba(0,113,186,0.18)";
+    const e7TintBg    = e7IsOrange  ? "#fff8f0" : "#e6f2fb";
+    const e7TintBd    = e7IsOrange  ? "rgba(255,124,0,0.22)" : "rgba(0,113,186,0.18)";
+    const cfBadge = (isOrange) => `<span style="background:${isOrange?"#fff3e0":"#e6f2fb"};color:${isOrange?"#FF7C00":"#0071BA"};font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;">cheapest fixed</span>`;
+    const detailDiv = (bg,bd,content) => `<div style="margin-top:7px;margin-bottom:10px;padding:9px 9px 6px;background:${bg};border-radius:var(--r-sm);border:1px solid ${bd};">${content}</div>`;
+
     document.getElementById("bc").innerHTML=`
       <div class="bw"><div class="brow"><div class="bleft">⛽ ${fuel} fuel</div><div class="bright"><span class="bval">${fv(fuelA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(fuelA)}%;background:var(--navy);"></div></div></div>
-      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — standard rate</div><div class="bright">${stCol==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;">cheapest fixed</span>':''}${saveBadge(fuelA-stdA,"blue")}<span class="bval">${fv(stdA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stCol};"></div></div>
-        <div style="margin-top:7px;padding:9px 9px 5px;background:#e6f2fb;border-radius:var(--r-sm);border:1px solid rgba(0,113,186,0.18);"><div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 24p)</span><span>${fv(stdA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(stdA)}</span></div></div></div>
-      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — Economy 7</div><div class="bright">${e7Col==="#FF7C00"?'<span style="background:#fff3e0;color:#FF7C00;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;">cheapest fixed</span>':''}${saveBadge(fuelA-e7NetA,"orange")}<span class="bval">${fv(e7NetA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7Col};"></div></div>
-        <div style="margin-top:7px;padding:9px 9px 5px;background:#fff8f0;border-radius:var(--r-sm);border:1px solid rgba(255,124,0,0.18);"><div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(e7HomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(e7NetA)}</span></div></div></div>
+      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — standard rate</div><div class="bright">${stdIsOrange?cfBadge(true):""}${saveBadge(fuelA-stdA,stdIsOrange?"orange":"blue")}<span class="bval">${fv(stdA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stCol};"></div></div>
+        ${detailDiv(stdTintBg,stdTintBd,`<div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 24p)</span><span>${fv(stdA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(stdA)}</span></div>`)}</div>
+      <div class="bw"><div class="brow"><div class="bleft">⚡ EV — Economy 7</div><div class="bright">${e7IsOrange?cfBadge(true):""}${saveBadge(fuelA-e7NetA,e7IsOrange?"orange":"blue")}<span class="bval">${fv(e7NetA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7Col};"></div></div>
+        ${detailDiv(e7TintBg,e7TintBd,`<div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(e7HomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(e7NetA)}</span></div>`)}</div>
       <div class="bw" style="margin-bottom:6px;"><div class="brow"><div class="bleft">⚡ EV — smart tariff*</div><div class="bright"><span style="background:#e4f5ed;color:#0a7c4e;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;">lowest cost</span>${saveBadge(fuelA-evNetA,"green")}<span class="bval">${fv(evNetA)}</span></div></div><div class="bt"><div class="bf" style="width:${pct(evNetA)}%;background:#0a7c4e;"></div></div>
-        <div style="margin-top:7px;padding:9px 9px 5px;background:#f0faf5;border-radius:var(--r-sm);border:1px solid rgba(10,124,78,0.18);"><div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(evHomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(evNetA)}</span></div></div></div>`;
+        ${detailDiv("#f0faf5","rgba(10,124,78,0.22)",`<div class="acc-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div><div class="acc-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(evHomeA)}</span></div><div class="acc-row total"><span>Total</span><span>${fv(evNetA)}</span></div>`)}</div>`;
 
     document.getElementById("disc").textContent="All figures are indicative, based on your inputs and typical real-world efficiency. Home rate adjustments assume annual household usage of "+Math.round(homeKwh).toLocaleString("en-GB")+" kWh — 15% at night on Economy 7, 10% at night on a smart tariff. Fixed rate options are available on standard and Economy 7 tariffs. *A smart meter is typically required for EV smart tariffs.";
   }
