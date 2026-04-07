@@ -1,0 +1,1098 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EV Running Cost Calculator | ND Vehicle Consultancy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --white:      #ffffff;
+    --bg:         #f5f5f2;
+    --ink:        #1a2228;
+    --ink-mid:    #3a4750;
+    --ink-soft:   #5a6a76;
+    --charcoal:   #1e2b33;
+    --charcoal-2: #28363f;
+    --blue:       #625DA5;
+    --blue-2:     #504b8a;
+    --blue-soft:  #eeedf8;
+    --gold:       #f0d49a;
+    --amber:      #b18b42;
+    --amber-soft: #f7edd8;
+    --green:      #256346;
+    --green-soft: #e7f3ec;
+    --line:       rgba(26,34,40,0.09);
+    --line-mid:   rgba(26,34,40,0.14);
+    --sh-sm:      0 4px 14px rgba(18,24,28,0.07);
+    --sh-md:      0 12px 32px rgba(18,24,28,0.09);
+    --sh-lg:      0 24px 56px rgba(18,24,28,0.13);
+    --sh-xl:      0 32px 72px rgba(18,24,28,0.18);
+    --r-xl:       22px;
+    --r-lg:       16px;
+    --r-md:       11px;
+    --r-sm:       7px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Inter", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+
+
+  /* ─── MODAL SHELL ─── */
+  .modal-shell {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+  }
+
+  .modal-shell.open { display: block; }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(18,24,28,0.60);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .modal-positioner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    /* On mobile, anchor to bottom */
+  }
+
+  .modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    border-radius: var(--r-xl);
+    background: #f2f1f0;
+    border: 1px solid var(--line);
+    box-shadow: var(--sh-xl);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(18,24,28,0.55);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s;
+    line-height: 1;
+  }
+
+  .modal-close:hover { background: rgba(18,24,28,0.88); }
+
+  /* ─── CALCULATOR SHELL ─── */
+  .calc-hdr {
+    background: linear-gradient(150deg, var(--charcoal) 0%, var(--charcoal-2) 100%);
+    color: white;
+    padding: 22px 22px 18px;
+  }
+
+  .calc-hdr-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .calc-hdr h2 { font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 3px; line-height: 1.3; }
+  .calc-hdr p  { font-size: 12px; opacity: 0.65; }
+
+  .calc-hdr-top img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: white;
+    padding: 4px;
+    border: 1px solid rgba(255,255,255,0.12);
+    flex-shrink: 0;
+  }
+
+  .calc-steps {
+    display: flex;
+    border-radius: 9px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .calc-step {
+    flex: 1;
+    text-align: center;
+    padding: 9px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    color: rgba(255,255,255,0.38);
+    transition: background 0.18s, color 0.18s;
+    line-height: 1.3;
+  }
+
+  .calc-step.active { background: var(--amber); color: white; }
+  .calc-step.done   { color: rgba(255,255,255,0.75); }
+
+  .calc-body { padding: 16px; }
+
+  .calc-body-inner { display: grid; grid-template-columns: 1fr; }
+
+  .calc-panel {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    pointer-events: none;
+    position: relative;
+    z-index: 0;
+  }
+
+  .calc-panel.active {
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 1;
+  }
+
+  .slbl {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .fld label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+
+  .fld input, .fld select {
+    width: 100%;
+    height: 40px;
+    border: 1.5px solid var(--line-mid);
+    border-radius: var(--r-sm);
+    padding: 0 11px;
+    font-family: "DM Mono", monospace;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .fld input:focus, .fld select:focus { border-color: var(--blue); }
+  .fld input.big { font-size: 17px; font-weight: 500; height: 44px; }
+
+  /* Miles mode toggle — horizontal tabs (MWC style) */
+  .mtog {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .tb {
+    flex: 1;
+    padding: 7px 4px;
+    border: 1.5px solid var(--line-mid);
+    border-radius: var(--r-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--ink-soft);
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .tb.active { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    background: var(--blue-soft);
+    color: var(--blue-2);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-top: 7px;
+  }
+
+  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 4px; }
+
+  .cbtn {
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 15px 9px 11px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--white);
+    transition: all 0.18s;
+    box-shadow: var(--sh-sm);
+  }
+
+  .cbtn:hover { border-color: rgba(98,93,165,0.32); transform: translateY(-1px); }
+  .cbtn.sel   { border-color: var(--blue); background: var(--blue-soft); }
+  .cbtn .ico  { font-size: 26px; display: block; color: var(--ink-soft); margin-bottom: 7px; transition: color 0.18s; }
+  .cbtn.sel .ico { color: var(--blue); }
+  .cbtn .cn   { display: block; font-size: 12px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .cbtn.sel .cn { color: var(--blue); }
+  .cbtn .ce   { display: block; margin-top: 3px; font-size: 10px; color: var(--ink-soft); line-height: 1.4; }
+  .cbtn .ck   { display: block; margin-top: 6px; font-size: 11px; color: var(--amber); font-weight: 700; }
+
+  .btnp {
+    width: 100%;
+    height: 44px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+    box-shadow: 0 4px 14px rgba(98,93,165,0.26);
+  }
+
+  .btnp:hover  { background: var(--blue-2); }
+  .btnp:active { transform: scale(0.99); }
+
+  /* ─── ADVANCED ─── */
+  .adv-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: var(--bg);
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .adv-toggle:hover { background: var(--blue-soft); color: var(--blue); }
+  .adv-toggle .adv-chev { font-size: 10px; transition: transform 0.2s; }
+  .adv-toggle.open .adv-chev { transform: rotate(180deg); }
+
+  .adv-body {
+    display: none;
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .adv-body.open { display: block; }
+  .adv-body .adv-hint { font-size: 10px; color: var(--ink-soft); line-height: 1.55; margin-top: 6px; }
+
+  /* ─── STEPPERS ─── */
+  .input-stepper { display: flex; align-items: stretch; width: 100%; }
+  .input-stepper input { flex: 1; border-radius: var(--r-sm) 0 0 var(--r-sm) !important; border-right: none !important; }
+  .stepper-btns { display: flex; flex-direction: column; flex-shrink: 0; }
+
+  .stepper-btns button {
+    width: 32px;
+    flex: 1;
+    border: 1.5px solid var(--line-mid);
+    background: var(--white);
+    color: var(--ink-soft);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .stepper-btns button:first-child { border-radius: 0 var(--r-sm) 0 0; border-bottom: none; }
+  .stepper-btns button:last-child  { border-radius: 0 0 var(--r-sm) 0; }
+  .stepper-btns button:hover { background: var(--blue-soft); color: var(--blue); border-color: var(--blue); }
+
+  /* ─── RESULTS ─── */
+  .tri {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .tc {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 15px 10px 12px;
+    text-align: center;
+    position: relative;
+    margin-top: 10px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .tcl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); margin-bottom: 6px; }
+  .tcv { font-family: "DM Mono", monospace; font-size: 17px; font-weight: 500; color: var(--ink); line-height: 1; }
+  .tcs { font-size: 9px; color: var(--ink-soft); margin-top: 4px; }
+
+  .badge {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    z-index: 1;
+  }
+
+  .badge-fix  { background: var(--amber-soft); color: var(--amber); }
+  .badge-best { background: var(--green-soft); color: var(--green); }
+
+  .hero-result {
+    background: linear-gradient(150deg, var(--charcoal) 0%, var(--charcoal-2) 100%);
+    color: white;
+    border-radius: var(--r-md);
+    padding: 16px 16px 14px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: var(--sh-md);
+  }
+
+  .hero-result .hl { font-size: 11px; opacity: 0.60; margin-bottom: 5px; }
+  .hero-result .hv { font-family: "DM Mono", monospace; font-size: 38px; font-weight: 500; color: #6ee09c; line-height: 1; }
+  .hero-result .hs { font-size: 12px; opacity: 0.65; margin-top: 4px; }
+  .hero-result .ha { font-size: 12px; opacity: 0.80; margin-top: 7px; font-weight: 700; }
+
+  .hmt-wrap { display: flex; justify-content: center; margin-top: 12px; padding: 0 12px; }
+  .hmt-bar  { display: flex; background: rgba(255,255,255,0.10); border-radius: 8px; width: 100%; max-width: 260px; overflow: hidden; }
+
+  .hmt {
+    flex: 1;
+    color: rgba(255,255,255,0.40);
+    cursor: pointer;
+    padding: 9px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background 0.18s, color 0.18s;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .hmt.on { background: var(--amber); color: white; }
+
+  /* ─── BREAKDOWN ─── */
+  .big-acc-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 11px 13px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ink);
+    box-shadow: var(--sh-sm);
+  }
+
+  .big-acc-toggle .chev { font-size: 11px; color: var(--ink-soft); transition: transform 0.2s; }
+  .big-acc-toggle.open .chev { transform: rotate(180deg); }
+
+  .bc {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 4px 13px 4px;
+    margin-bottom: 9px;
+    box-shadow: var(--sh-sm);
+  }
+
+  .bw { padding: 12px 0 10px; border-bottom: 1px solid var(--line); }
+  .bw:last-child { border-bottom: none; padding-bottom: 4px; }
+
+  .brow  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+  .bleft { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--ink); flex: 1; min-width: 0; flex-wrap: wrap; row-gap: 3px; }
+  .bright { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+  .bval  { font-family: "DM Mono", monospace; font-weight: 600; color: var(--ink); font-size: 13px; }
+
+  .saved-pill { font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+  .saved-pill-amber   { background: var(--amber-soft); color: var(--amber); }
+  .saved-pill-green   { background: var(--green-soft); color: var(--green); }
+  .saved-pill-neutral { background: var(--blue-soft); color: var(--blue-2); }
+
+  .bt { height: 8px; background: rgba(26,34,40,0.07); border-radius: 999px; overflow: hidden; }
+  .bf { height: 100%; border-radius: 999px; }
+
+  .sub-breakdown { margin-top: 10px; padding: 10px 12px 8px; border-radius: var(--r-sm); border: 1px solid var(--line); }
+  .sub-breakdown.sub-amber   { background: var(--amber-soft); }
+  .sub-breakdown.sub-green   { background: var(--green-soft); }
+  .sub-breakdown.sub-lavender { background: var(--blue-soft); }
+
+  .sub-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); margin-bottom: 5px; gap: 8px; }
+  .sub-row span:last-child { font-family: "DM Mono", monospace; font-weight: 500; color: var(--ink); font-size: 11px; white-space: nowrap; }
+  .sub-row.sub-total { border-top: 1px solid rgba(26,34,40,0.10); padding-top: 6px; margin-top: 4px; font-weight: 800; color: var(--ink); font-size: 12px; }
+  .sub-row.sub-total span:last-child { font-size: 12px; font-weight: 800; }
+
+  .adj-label { display: flex; align-items: center; gap: 5px; }
+  .tip-wrap  { position: relative; display: inline-flex; }
+
+  .tip-btn {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: rgba(26,34,40,0.10); color: var(--ink-soft);
+    font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; font-family: inherit; flex-shrink: 0; line-height: 1;
+  }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--charcoal);
+    color: white;
+    font-size: 10px;
+    line-height: 1.45;
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 220px;
+    text-align: left;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--charcoal);
+  }
+
+  .tip-wrap.show .tooltip { display: block; }
+
+  /* ─── CTA BLOCK ─── */
+  .calc-cta {
+    background: linear-gradient(150deg, var(--charcoal) 0%, var(--charcoal-2) 100%);
+    color: white;
+    border-radius: var(--r-md);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--sh-md);
+  }
+
+  .calc-cta h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .cta-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .cta-body p {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.60;
+    margin: 0;
+  }
+
+  .cta-uw-logo {
+    flex-shrink: 0;
+    width: 64px;
+    height: auto;
+    object-fit: contain;
+    opacity: 0.92;
+  }
+
+  .cta-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .ctab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 18px;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.1s;
+    flex: 1;
+    color: white;
+  }
+
+  .ctab:hover { opacity: 0.88; transform: translateY(-1px); }
+  .ctab-wa    { background: #25D366; box-shadow: 0 4px 14px rgba(37,211,102,0.28); }
+  .ctab-call  { background: var(--blue); box-shadow: 0 4px 14px rgba(98,93,165,0.28); }
+  .ctab-email { background: var(--blue-2); }
+
+  .disc {
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 4px 6px;
+  }
+
+  .hide { display: none !important; }
+
+  /* ─── MOBILE: full-screen sheet ─── */
+  @media (max-width: 540px) {
+    body { padding: 0; align-items: flex-end; }
+
+    .modal-positioner {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    .modal-dialog {
+      max-width: 100%;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      max-height: 92vh;
+    }
+
+    .r2 { grid-template-columns: 1fr; }
+
+    .tri { gap: 6px; }
+    .tc  { padding: 14px 6px 10px; }
+    .tcl { font-size: 8px; }
+    .tcv { font-size: 14px; }
+    .tcs { font-size: 8px; }
+    .hero-result .hv { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ─── MODAL ─── -->
+  <div class="modal-shell" id="calcModal" aria-modal="true" role="dialog" aria-label="EV Running Cost Calculator" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeCalc()"></div>
+    <div class="modal-positioner">
+      <div class="modal-dialog">
+        <button class="modal-close" onclick="closeCalc()" aria-label="Close calculator">×</button>
+
+        <!-- HEADER -->
+        <div class="calc-hdr">
+          <div class="calc-hdr-top">
+            <div>
+              <h2>EV Running Cost Calculator</h2>
+              <p>Compare your current car with a likely EV alternative</p>
+            </div>
+            <img src="https://aqcroft.github.io/Ndvc/assets/NDVC_square.webp" alt="ND Vehicle Consultancy" />
+          </div>
+          <div class="calc-steps">
+            <div class="calc-step active" id="p1" onclick="go(1)">1. Your car &amp; mileage</div>
+            <div class="calc-step"        id="p2" onclick="go(2)">2. Your EV choice</div>
+            <div class="calc-step"        id="p3" onclick="go(3)">3. Your saving</div>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="calc-body">
+          <div class="calc-body-inner">
+
+            <!-- STEP 1 -->
+            <div class="calc-panel active" id="s1">
+              <div class="slbl">Tell us about your current car</div>
+              <div class="card">
+                <div class="r2" style="margin-bottom:11px;">
+                  <div class="fld">
+                    <label>Fuel type</label>
+                    <select id="fuelType" onchange="updatePPL()">
+                      <option value="diesel">Diesel</option>
+                      <option value="petrol">Petrol</option>
+                    </select>
+                  </div>
+                  <div class="fld">
+                    <label>Pence per litre</label>
+                    <div class="input-stepper">
+                      <input type="number" id="ppl" value="164.9" min="100" max="300" class="big" step="1"/>
+                      <div class="stepper-btns">
+                        <button type="button" onclick="stepVal('ppl',1,1,100,300,true)">▲</button>
+                        <button type="button" onclick="stepVal('ppl',-1,1,100,300,true)">▼</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="fld" style="margin-bottom:11px;">
+                  <label>MPG — your car's fuel economy</label>
+                  <div class="input-stepper">
+                    <input type="number" id="mpg" value="45" min="20" max="90"/>
+                    <div class="stepper-btns">
+                      <button type="button" onclick="stepVal('mpg',1,1,20,90,false)">▲</button>
+                      <button type="button" onclick="stepVal('mpg',-1,1,20,90,false)">▼</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="chip" style="margin-bottom:12px;">💡 Not sure? Diesel ~45 mpg · Petrol ~35 mpg</div>
+
+                <div style="border-top:1px solid var(--line);margin:0 -14px;padding:12px 14px 0;">
+                  <div class="slbl" style="margin-bottom:8px;">How many miles do you drive?</div>
+                  <div class="mtog">
+                    <div class="tb active" id="tb-a" onclick="swm('a')">Annual</div>
+                    <div class="tb"        id="tb-w" onclick="swm('w')">Weekly</div>
+                    <div class="tb"        id="tb-d" onclick="swm('d')">Daily</div>
+                  </div>
+                  <div id="fa" class="fld">
+                    <label>Annual mileage</label>
+                    <div class="input-stepper">
+                      <input type="text" id="mA" value="10,000" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                      <div class="stepper-btns">
+                        <button type="button" onclick="stepMiles('mA',500)">▲</button>
+                        <button type="button" onclick="stepMiles('mA',-500)">▼</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="fw" class="fld hide">
+                    <label>Weekly miles</label>
+                    <div class="input-stepper">
+                      <input type="text" id="mW" value="200" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                      <div class="stepper-btns">
+                        <button type="button" onclick="stepMiles('mW',50)">▲</button>
+                        <button type="button" onclick="stepMiles('mW',-50)">▼</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="fd" class="fld hide">
+                    <label>Daily miles (working days)</label>
+                    <div class="input-stepper">
+                      <input type="text" id="mD" value="40" inputmode="numeric" class="big" oninput="fmtMiles(this);upd();"/>
+                      <div class="stepper-btns">
+                        <button type="button" onclick="stepMiles('mD',5)">▲</button>
+                        <button type="button" onclick="stepMiles('mD',-5)">▼</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chip" id="meq" style="margin-top:6px;">≈ 10,000 miles/year · 833 miles/month</div>
+                </div>
+
+                <!-- ADVANCED -->
+                <div class="adv-toggle" id="adv-toggle" onclick="toggleAdv()">
+                  <span>⚙ Advanced</span>
+                  <span class="adv-chev">▾</span>
+                </div>
+                <div class="adv-body" id="adv-body">
+                  <div class="fld">
+                    <label>Annual household electricity usage (kWh)</label>
+                    <div class="input-stepper">
+                      <input type="number" id="homeKwh" value="2700" min="1000" max="6000" step="100"/>
+                      <div class="stepper-btns">
+                        <button type="button" onclick="stepVal('homeKwh',1,100,1000,6000,false)">▲</button>
+                        <button type="button" onclick="stepVal('homeKwh',-1,100,1000,6000,false)">▼</button>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="adv-hint">UK average is 2,700 kWh/year. This affects the home rate adjustment on Economy 7 and smart tariff calculations.</p>
+                </div>
+              </div>
+              <button class="btnp" onclick="go(2)">Next: Choose your EV →</button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="calc-panel" id="s2">
+              <div class="slbl">What kind of EV are you thinking about?</div>
+              <div class="cgrid" id="carGrid"></div>
+              <div class="chip" style="margin-bottom:13px;">Efficiency figures are typical real-world estimates</div>
+              <button class="btnp" onclick="go(3)">See your potential saving →</button>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="calc-panel" id="s3">
+              <div class="tri" id="tri"></div>
+              <div id="heroResult" class="hero-result"></div>
+
+              <div class="big-acc-toggle" id="bc-toggle" onclick="toggleBigAcc()">
+                <span>Show full cost breakdown</span>
+                <span class="chev">▾</span>
+              </div>
+              <div id="bc" class="bc" style="display:none;"></div>
+
+              <!-- CTA -->
+              <div class="calc-cta">
+                <h3>Want to explore your options?</h3>
+                <div class="cta-body">
+                  <p>I work with Utility Warehouse to help my clients get set up on the best home charging tariff — so those savings are real from day one. Get in touch and let's talk it through.</p>
+                  <a href="https://connectors.uw.co.uk/CN-8RVO" target="_blank" rel="noopener">
+                    <img src="https://aqcroft.github.io/Ndvc/assets/UW_logo.webp" alt="Utility Warehouse" class="cta-uw-logo"/>
+                  </a>
+                </div>
+                <div class="cta-btns">
+                  <a id="ndvc-wa"    href="https://wa.me/447918052183" target="_blank" rel="noopener" class="ctab ctab-wa">WhatsApp</a>
+                  <a                 href="tel:+447918052183"           class="ctab ctab-call">Call</a>
+                  <a id="ndvc-email" href="mailto:ndvcltd@gmail.com"    class="ctab ctab-email">Email</a>
+                </div>
+              </div>
+
+              <div class="disc" id="disc"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /modal-dialog -->
+    </div><!-- /modal-positioner -->
+  </div><!-- /modal-shell -->
+
+  <script>
+    /* ─── DATA ─── */
+    const CARS = [
+      { id:"hatch", name:"Family hatchback",   eg:"VW ID.3, Nissan Leaf",     mpk:3.8, fa:"fa-solid fa-car-side"     },
+      { id:"exec",  name:"Executive saloon",   eg:"Tesla Model 3, BMW i4",    mpk:3.5, fa:"fa-solid fa-car-rear"     },
+      { id:"suv",   name:"Family SUV",          eg:"VW ID.4, Hyundai IONIQ 5", mpk:3.2, fa:"fa-solid fa-truck-pickup" },
+      { id:"large", name:"Large SUV / 7-seat",  eg:"Tesla Model Y, Kia EV9",   mpk:2.8, fa:"fa-solid fa-van-shuttle"  },
+    ];
+
+    const PPL      = { diesel:164.9, petrol:142.9 };
+    const STD_P    = 24, E7_NIGHT = 9, E7_DAY = 34, EV_NIGHT = 7, EV_DAY = 30;
+    const TOOLTIP  = "Overnight charging is cheaper — but daytime electricity costs more on this plan. Both effects are included here.";
+
+    let sel = "hatch", mMode = "a", view = "m", R = {};
+
+    /* ─── MODAL ─── */
+    function openCalc()  {
+      document.getElementById("calcModal").classList.add("open");
+      document.getElementById("calcModal").setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeCalc() {
+      document.getElementById("calcModal").classList.remove("open");
+      document.getElementById("calcModal").setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+    }
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeCalc(); });
+
+    /* ─── STEPPER / FORMAT ─── */
+    function fmtMiles(el) { const r = el.value.replace(/[^0-9]/g,""); if(r) el.value = parseInt(r,10).toLocaleString("en-GB"); }
+
+    function stepVal(id, dir, step, min, max, keepDecimal) {
+      const el = document.getElementById(id); let val = parseFloat(el.value) || 0;
+      if (keepDecimal) { const dec = val - Math.floor(val); val = Math.round(Math.floor(val) + dir*step) + dec; }
+      else             { val = Math.round(val + dir*step); }
+      val = Math.max(min, Math.min(max, val));
+      el.value = keepDecimal ? val.toFixed(1) : val;
+    }
+
+    function stepMiles(id, step) {
+      const el = document.getElementById(id);
+      let val = parseFloat((el.value||"0").replace(/,/g,"")) || 0;
+      val = Math.max(0, val + step);
+      el.value = val.toLocaleString("en-GB");
+      upd();
+    }
+
+    /* ─── FUEL / MILEAGE ─── */
+    function updatePPL() {
+      const ft = document.getElementById("fuelType").value;
+      document.getElementById("ppl").value = PPL[ft];
+      document.getElementById("mpg").value = ft === "diesel" ? 45 : 35;
+    }
+
+    function swm(m) {
+      mMode = m;
+      ["a","w","d"].forEach(x => {
+        document.getElementById("tb-"+x).classList.toggle("active", x===m);
+        document.getElementById("f"+x).classList.toggle("hide", x!==m);
+      });
+      upd();
+    }
+
+    function getAnnual() {
+      const c = id => parseFloat((document.getElementById(id).value||"0").replace(/,/g,"")) || 0;
+      if (mMode==="a") return c("mA") || 10000;
+      if (mMode==="w") return (c("mW") || 200) * 52;
+      return (c("mD") || 40) * 235;
+    }
+
+    function upd() {
+      const a = getAnnual(), el = document.getElementById("meq");
+      if (el) el.textContent = "≈ " + Math.round(a).toLocaleString("en-GB") + " miles/year · " + Math.round(a/12).toLocaleString("en-GB") + " miles/month";
+    }
+
+    /* ─── ADVANCED TOGGLE ─── */
+    function toggleAdv() {
+      const body = document.getElementById("adv-body");
+      const tog  = document.getElementById("adv-toggle");
+      const open = body.classList.contains("open");
+      body.classList.toggle("open", !open);
+      tog.classList.toggle("open",  !open);
+    }
+
+    /* ─── STEPS ─── */
+    function go(n) {
+      ["s1","s2","s3"].forEach((id,i) => {
+        const p = document.getElementById(id); if(p) p.classList.toggle("active", i+1===n);
+      });
+      ["p1","p2","p3"].forEach((id,i) => {
+        const el = document.getElementById(id); if(!el) return;
+        el.classList.remove("active","done");
+        if (i+1 < n) el.classList.add("done");
+        if (i+1 === n) el.classList.add("active");
+      });
+      if (n === 3) calcAndRender();
+    }
+
+    /* ─── CAR GRID ─── */
+    function renderCars() {
+      document.getElementById("carGrid").innerHTML = CARS.map(c => `
+        <div class="cbtn${sel===c.id?" sel":""}" onclick="pick('${c.id}')">
+          <i class="${c.fa} ico"></i>
+          <span class="cn">${c.name}</span>
+          <span class="ce">${c.eg}</span>
+          <span class="ck">~${c.mpk} mi/kWh</span>
+        </div>`).join("");
+    }
+
+    function pick(id) { sel = id; renderCars(); }
+
+    /* ─── FORMAT ─── */
+    function f(n)  { return "£" + Math.round(n).toLocaleString("en-GB"); }
+    function fv(n) { return view === "m" ? f(n/12)+"/m" : f(n)+"/yr"; }
+
+    function setView(v) { view = v; if (Object.keys(R).length) renderResults(); }
+
+    /* ─── CALCULATE ─── */
+    function calcAndRender() {
+      const car      = CARS.find(c => c.id === sel) || CARS[0];
+      const ppl      = parseFloat(document.getElementById("ppl").value)     || 164.9;
+      const mpg      = parseFloat(document.getElementById("mpg").value)     || 45;
+      const fuel     = document.getElementById("fuelType").value;
+      const annual   = getAnnual();
+      const homeKwh  = parseFloat(document.getElementById("homeKwh").value) || 2700;
+
+      const fuelA  = annual * (1 / (mpg * 0.2199692)) * (ppl / 100);
+      const kwhA   = annual / car.mpk;
+      const stdA   = kwhA * (STD_P / 100);
+      const e7CarA = kwhA * (E7_NIGHT / 100);
+      const e7HomeA = (homeKwh * 0.85 * (E7_DAY/100)) + (homeKwh * 0.15 * (E7_NIGHT/100)) - (homeKwh * (STD_P/100));
+      const e7NetA = e7CarA + e7HomeA;
+      const evCarA = kwhA * (EV_NIGHT / 100);
+      const evHomeA = (homeKwh * 0.90 * (EV_DAY/100)) + (homeKwh * 0.10 * (EV_NIGHT/100)) - (homeKwh * (STD_P/100));
+      const evNetA = evCarA + evHomeA;
+
+      R = { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA, homeKwh, mpg, ppl };
+      renderResults();
+      buildContactLinks();
+    }
+
+    /* ─── RENDER RESULTS ─── */
+    function renderResults() {
+      const { car, fuel, annual, kwhA, fuelA, stdA, e7NetA, e7CarA, e7HomeA, evNetA, evCarA, evHomeA, homeKwh } = R;
+      const cheapest  = stdA <= e7NetA ? "std" : "e7";
+      const midV      = cheapest === "std" ? stdA    : e7NetA;
+      const midLabel  = cheapest === "std" ? "EV — standard rate" : "EV — Economy 7";
+      const midSub    = cheapest === "std" ? "at 24p/kWh"         : "~9p overnight";
+
+      /* Tri cards */
+      document.getElementById("tri").innerHTML = `
+        <div class="tc">
+          <div class="tcl">Your ${fuel}</div>
+          <div class="tcv">${fv(fuelA)}</div>
+          <div class="tcs">current cost</div>
+        </div>
+        <div class="tc" style="border:2px solid var(--amber);">
+          <div class="badge badge-fix">cheapest fixed</div>
+          <div class="tcl">${midLabel}</div>
+          <div class="tcv" style="color:var(--amber);">${fv(midV)}</div>
+          <div class="tcs">${midSub}</div>
+        </div>
+        <div class="tc" style="border:2px solid var(--green);">
+          <div class="badge badge-best">lowest cost</div>
+          <div class="tcl">EV — smart tariff*</div>
+          <div class="tcv" style="color:var(--green);">${fv(evNetA)}</div>
+          <div class="tcs">~7p overnight</div>
+        </div>`;
+
+      /* Hero saving */
+      const bestSave = fuelA - evNetA, pos = bestSave > 0;
+      const toggles  = `<div class="hmt-wrap"><div class="hmt-bar"><div class="hmt${view==="m"?" on":""}" onclick="setView('m')">Monthly</div><div class="hmt${view==="a"?" on":""}" onclick="setView('a')">Annual</div></div></div>`;
+      document.getElementById("heroResult").innerHTML = pos
+        ? `<div class="hl">Estimated saving — ${Math.round(annual).toLocaleString("en-GB")} miles a year in a ${fuel}</div><div class="hv">${fv(bestSave)}</div><div class="ha">${car.name} EV on a smart tariff</div>${toggles}`
+        : `<div class="hl">Compared with your ${fuel} — ${Math.round(annual).toLocaleString("en-GB")} miles a year</div><div class="hv" style="color:#eb8a49;">${fv(Math.abs(bestSave))}</div><div class="hs">more per ${view==="m"?"month":"year"} to charge — the right tariff could narrow that gap</div><div class="ha">${car.name} EV</div>${toggles}`;
+
+      /* Breakdown bars */
+      const maxV      = Math.max(fuelA, stdA) * 1.12;
+      const pct       = n => Math.min(n / maxV * 70, 70).toFixed(1);
+      const stdSave   = fuelA - stdA, e7Save = fuelA - e7NetA, evSave = fuelA - evNetA;
+      const CHARCOAL  = "#1e2b33", AMBER = "var(--amber)", GREEN = "var(--green)";
+      const stdBarCol = cheapest === "std" ? AMBER : "#d3b06b";
+      const e7BarCol  = cheapest === "e7"  ? AMBER : "#d3b06b";
+
+      const stdSubHtml = stdSave > 0 ? `
+        <div class="sub-breakdown sub-lavender">
+          <div class="sub-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 24p)</span><span>${fv(stdA)}</span></div>
+          <div class="sub-row sub-total"><span>Total</span><span>${fv(stdA)}</span></div>
+        </div>` : "";
+
+      const e7SubHtml = `
+        <div class="sub-breakdown sub-amber">
+          <div class="sub-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 9p)</span><span>${fv(e7CarA)}</span></div>
+          <div class="sub-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-e7" onclick="toggleTip('tip-e7',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(e7HomeA)}</span></div>
+          <div class="sub-row sub-total"><span>Total</span><span>${fv(e7NetA)}</span></div>
+        </div>`;
+
+      const evSubHtml = `
+        <div class="sub-breakdown sub-green">
+          <div class="sub-row"><span>Car charging (${Math.round(kwhA).toLocaleString("en-GB")} kWh × 7p)</span><span>${fv(evCarA)}</span></div>
+          <div class="sub-row"><div class="adj-label"><span>Home rate adjustment</span><div class="tip-wrap" id="tip-ev" onclick="toggleTip('tip-ev',event)"><button class="tip-btn" type="button">i</button><div class="tooltip">${TOOLTIP}</div></div></div><span>+${fv(evHomeA)}</span></div>
+          <div class="sub-row sub-total"><span>Total</span><span>${fv(evNetA)}</span></div>
+        </div>`;
+
+      document.getElementById("bc").innerHTML = `
+        <div class="bw">
+          <div class="brow"><div class="bleft">⛽ ${fuel} fuel</div><div class="bright"><span class="bval">${fv(fuelA)}</span></div></div>
+          <div class="bt"><div class="bf" style="width:${pct(fuelA)}%;background:${CHARCOAL};"></div></div>
+        </div>
+        <div class="bw">
+          <div class="brow">
+            <div class="bleft">⚡ EV — standard rate ${cheapest==="std"?'<span class="saved-pill saved-pill-amber">cheapest fixed</span>':''} ${stdSave>0?`<span class="saved-pill ${cheapest==="std"?"saved-pill-amber":"saved-pill-neutral"}">${fv(stdSave)} saved</span>`:''}</div>
+            <div class="bright"><span class="bval">${fv(stdA)}</span></div>
+          </div>
+          <div class="bt"><div class="bf" style="width:${pct(stdA)}%;background:${stdBarCol};"></div></div>
+          ${stdSubHtml}
+        </div>
+        <div class="bw">
+          <div class="brow">
+            <div class="bleft">⚡ EV — Economy 7 ${cheapest==="e7"?'<span class="saved-pill saved-pill-amber">cheapest fixed</span>':''} ${e7Save>0?`<span class="saved-pill ${cheapest==="e7"?"saved-pill-amber":"saved-pill-neutral"}">${fv(e7Save)} saved</span>`:''}</div>
+            <div class="bright"><span class="bval">${fv(e7NetA)}</span></div>
+          </div>
+          <div class="bt"><div class="bf" style="width:${pct(e7NetA)}%;background:${e7BarCol};"></div></div>
+          ${e7SubHtml}
+        </div>
+        <div class="bw">
+          <div class="brow">
+            <div class="bleft">⚡ EV — smart tariff* <span class="saved-pill saved-pill-green">lowest cost</span> ${evSave>0?`<span class="saved-pill saved-pill-green">${fv(evSave)} saved</span>`:''}</div>
+            <div class="bright"><span class="bval">${fv(evNetA)}</span></div>
+          </div>
+          <div class="bt"><div class="bf" style="width:${pct(evNetA)}%;background:${GREEN};"></div></div>
+          ${evSubHtml}
+        </div>`;
+
+      document.getElementById("disc").textContent = "All figures are indicative, based on your inputs and typical real-world efficiency. Home rate adjustments assume annual household usage of " + Math.round(homeKwh).toLocaleString("en-GB") + " kWh — 15% at night on Economy 7, 10% at night on a smart tariff. Fixed rate options are available on standard and Economy 7 tariffs. *A smart meter is typically required for EV smart tariffs.";
+    }
+
+    /* ─── CONTACT LINKS ─── */
+    function buildContactLinks() {
+      if (!Object.keys(R).length) return;
+      const { car, fuel, annual, fuelA, stdA, e7NetA, evNetA, mpg, ppl } = R;
+      const smartM = Math.round((fuelA - evNetA) / 12);
+      const fixedM = Math.round((fuelA - Math.min(stdA, e7NetA)) / 12);
+      const stdM   = Math.round((fuelA - stdA) / 12);
+
+      const msg = "Hi Nick,\n\nI've just used your EV calculator and I'd like to find out more.\n\n"
+        + "My current car: " + fuel + ", " + Math.round(annual).toLocaleString("en-GB") + " miles/year\n"
+        + "Fuel economy: " + mpg + " MPG at " + ppl + "p/l\n"
+        + "EV I looked at: " + car.name + "\n"
+        + "Estimated monthly savings:\n"
+        + "  Smart tariff: £" + Math.max(0, smartM) + "/m\n"
+        + "  Cheapest fixed: £" + Math.max(0, fixedM) + "/m\n"
+        + "  Standard rate: £" + Math.max(0, stdM) + "/m";
+
+      const waEl = document.getElementById("ndvc-wa");
+      const emEl = document.getElementById("ndvc-email");
+      if (waEl) waEl.href = "https://wa.me/447918052183?text=" + encodeURIComponent(msg);
+      if (emEl) emEl.href = "mailto:ndvcltd@gmail.com?subject=" + encodeURIComponent("EV Calculator Enquiry — NDVC") + "&body=" + encodeURIComponent(msg);
+    }
+
+    /* ─── TOGGLES ─── */
+    function toggleBigAcc() {
+      const a = document.getElementById("bc");
+      const b = document.getElementById("bc-toggle");
+      if (!a) return;
+      const open = a.style.display === "block";
+      a.style.display = open ? "none" : "block";
+      if (b) {
+        b.classList.toggle("open", !open);
+        b.querySelector("span:first-child").textContent = open ? "Show full cost breakdown" : "Hide full cost breakdown";
+      }
+    }
+
+    function toggleTip(id, e) {
+      if (e) e.stopPropagation();
+      document.querySelectorAll(".tip-wrap.show").forEach(el => { if (el.id !== id) el.classList.remove("show"); });
+      const el = document.getElementById(id); if (el) el.classList.toggle("show");
+    }
+
+    document.addEventListener("click", () => document.querySelectorAll(".tip-wrap.show").forEach(el => el.classList.remove("show")));
+
+    /* ─── INIT ─── */
+    renderCars();
+    upd();
+    openCalc();
+  </script>
+</body>
+</html>
