@@ -4,7 +4,72 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EV Running Cost Calculator | ND Vehicle Consultancy</title>
+<title>EV Running Cost Calculator UK | Petrol, Diesel & Home Charging Comparison</title>
+<meta name="description" content="Free UK EV running cost calculator from ND Vehicle Consultancy. Compare petrol or diesel running costs with an electric car using your mileage, MPG and home electricity tariff, including overnight EV charging.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<link rel="canonical" href="https://aqcroft.github.io/ev-savings-calculator/ndvc.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_GB">
+<meta property="og:title" content="EV Running Cost Calculator UK | ND Vehicle Consultancy">
+<meta property="og:description" content="Compare petrol or diesel running costs with a likely EV alternative using your mileage, fuel economy and home charging tariff.">
+<meta property="og:url" content="https://aqcroft.github.io/ev-savings-calculator/ndvc.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EV Running Cost Calculator UK">
+<meta name="twitter:description" content="Compare your current petrol or diesel car with a likely EV alternative and see the effect of home charging tariffs.">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"WebApplication",
+      "@id":"https://aqcroft.github.io/ev-savings-calculator/ndvc.html#app",
+      "name":"EV Running Cost Calculator UK",
+      "url":"https://aqcroft.github.io/ev-savings-calculator/ndvc.html",
+      "description":"A free UK EV running cost calculator from ND Vehicle Consultancy that compares a current petrol or diesel car with a likely electric vehicle alternative using mileage, fuel economy, EV efficiency and home charging tariffs.",
+      "applicationCategory":"UtilitiesApplication",
+      "operatingSystem":"Any",
+      "browserRequirements":"Requires a modern web browser with JavaScript enabled",
+      "inLanguage":"en-GB",
+      "isAccessibleForFree":true,
+      "dateModified":"2026-09-24",
+      "provider":{"@type":"Organization","name":"ND Vehicle Consultancy"},
+      "audience":{"@type":"PeopleAudience","geographicArea":{"@type":"Country","name":"United Kingdom"}},
+      "offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"}
+    },
+    {
+      "@type":"FAQPage",
+      "@id":"https://aqcroft.github.io/ev-savings-calculator/ndvc.html#faq",
+      "mainEntity":[
+        {
+          "@type":"Question",
+          "name":"How much does it cost to run an electric car compared with petrol or diesel?",
+          "acceptedAnswer":{"@type":"Answer","text":"The answer depends on annual mileage, petrol or diesel price, MPG, EV efficiency and the electricity tariff used for charging. This calculator compares those inputs directly and estimates the difference in running cost."}
+        },
+        {
+          "@type":"Question",
+          "name":"How much does it cost to charge an EV at home?",
+          "acceptedAnswer":{"@type":"Answer","text":"Home charging cost depends on the vehicle's electricity consumption and the tariff rate paid per kWh. The calculator models standard electricity, Economy 7 style charging and a lower overnight EV tariff so the effect can be compared."}
+        },
+        {
+          "@type":"Question",
+          "name":"Is an EV tariff worth it?",
+          "acceptedAnswer":{"@type":"Answer","text":"An EV tariff can reduce the cost of overnight charging, although some tariffs may have higher daytime electricity rates. This calculator includes both the cheaper charging window and the effect on household daytime electricity to give a fuller comparison."}
+        },
+        {
+          "@type":"Question",
+          "name":"Does the calculator use my own mileage and fuel economy?",
+          "acceptedAnswer":{"@type":"Answer","text":"Yes. You can enter annual, weekly or daily mileage, choose petrol or diesel, set your current fuel price and MPG, and compare those figures with a likely EV alternative."}
+        },
+        {
+          "@type":"Question",
+          "name":"Does the EV calculator include household electricity use?",
+          "acceptedAnswer":{"@type":"Answer","text":"Yes. An advanced input allows annual household electricity usage to be included because a cheaper overnight charging tariff can sometimes be paired with a different daytime electricity rate."}
+        }
+      ]
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -40,6 +105,17 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
+  .ai-search-context{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    padding:0!important;
+    margin:-1px!important;
+    overflow:hidden!important;
+    clip:rect(0,0,0,0)!important;
+    white-space:normal!important;
+    border:0!important;
+  }
 
   body {
     font-family: "Inter", sans-serif;
@@ -638,6 +714,17 @@
 </style>
 </head>
 <body>
+<section class="ai-search-context" aria-label="About this EV running cost calculator">
+  <h1>EV running cost calculator UK - compare petrol, diesel and home charging</h1>
+  <p>This free calculator from ND Vehicle Consultancy compares the running cost of a current petrol or diesel car with a likely electric vehicle alternative using your own mileage, fuel price and MPG.</p>
+  <p>It also compares home charging under a standard electricity tariff, an Economy 7 style tariff and a lower overnight EV charging tariff. The model includes both overnight charging costs and the effect of daytime household electricity rates.</p>
+  <h2>How much does it cost to charge an EV at home?</h2>
+  <p>The answer depends on EV efficiency, annual mileage and the electricity rate paid per kWh. The calculator converts mileage into estimated EV electricity use and compares the resulting cost with the current petrol or diesel vehicle.</p>
+  <h2>Is an EV tariff worth it?</h2>
+  <p>A lower overnight tariff can reduce home charging costs, but the saving should be considered alongside daytime electricity rates. The calculator includes annual household electricity usage so both effects can be considered together.</p>
+  <h2>What can I compare?</h2>
+  <p>Petrol or diesel fuel cost, MPG, annual or weekly mileage, likely EV efficiency, standard electricity, Economy 7 style rates and an overnight EV tariff.</p>
+</section>
 
   <!-- ─── MODAL ─── -->
   <div class="modal-shell" id="calcModal" aria-modal="true" role="dialog" aria-label="EV Running Cost Calculator" aria-hidden="true">
